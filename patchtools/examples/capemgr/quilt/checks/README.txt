@@ -1,0 +1,1 @@
+Checker output files will be generated in this folder when make_capemgr.c is run.

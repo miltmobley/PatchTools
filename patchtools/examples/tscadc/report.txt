@@ -1,0 +1,107 @@
+adc/0001-mfd-input-iio-ti_am335x_adc-use-one-structure-for-ti.patch
+	d1: h1=FIX?, h2=N/N
+	d2: h1=FIX?, h2=N/N, h3=N/N, h4=N/N
+	d3: N/N
+	d4: N/N
+
+adc/0002-input-ti_am33x_tsc-Step-enable-bits-made-configurabl.patch
+	d1: h1=N/N, h2=FIX?, h3=FIX?, h4=N/N
+	d2: h1=N/N, h2=N/N, h3=FIX?, h4=N/N
+	d3: h1=FIX?, h2=N/N, h3=FIX?, h4=N/N, h5=N/N, h6=FIX?
+
+adc/0003-input-ti_am33x_tsc-Order-of-TSC-wires-made-configura.patch
+	d1: h1=N/N, h2=N/N, h3=N/N, h4=N/N, h5=N/N, h6=N/N, h7=FIX?, h8=FIX?, h9=N/N
+	d2: N/N ("old" file not found)
+		Inspection of the target version of the .c files that include this 'missing' .h file
+		shows that they all include the include/linux/mfd version of the file, which is present,
+		so the diff section is not needed.
+	d3: N/N
+
+adc/0004-input-ti_am33x_tsc-remove-unwanted-fifo-flush.patch
+	d1: h1=N/N, h2=N/N
+
+adc/0005-input-ti_am33x_tsc-Add-DT-support.patch
+	d1: N/N
+	d2: h1=N/N, h2=N/N, h3=FIX, h4=N/N, h5=N/N, h6=FIX, h7=FIX, h8=N/N, h9=N/N, h10=N/N,
+		h11=N/N?, h12=N/N, h13=N/N, h14=N/N, h15=N/N
+	d3: N/N
+	d4: N/N
+	
+adc/0006-iio-ti_am335x_adc-Add-DT-support.patch
+	d1: h1=N/N, h2=FIX, h3=FIX, h4=N/N, h5=FIX
+
+
+adc/0008-mfd-ti_am335x_tscadc-Add-DT-support.patch
+	d1: h1=N/N,
+		h2=FIX or N/U (target file uses DT, not platform data),
+		h3=N/N
+
+adc/0009-iio-ti_tscadc-provide-datasheet_name-and-scan_type.patch
+	d1: N/N
+	d2: N/N
+	
+adc/0010-mfd-ti_tscadc-deal-with-partial-activation.patch
+	d1: ? retest
+	d2: N/N
+	d3: N/N
+	
+adc/0011-input-ti_am335x_adc-use-only-FIFO0-and-clean-up-a-li.patch
+	d1: N/N
+	d2: N/N
+	d3: N/N	
+	
+adc/0012-input-ti_am335x_tsc-ACK-the-HW_PEN-irq-in-ISR.patch
+	d1: N/N
+
+adc/0013-input-ti_am335x_tsc-return-IRQ_NONE-if-there-was-no-.patch
+	d1: N/N
+	
+adc/0014-iio-ti_am335x_adc-Allow-to-specify-input-line.patch
+	d1: N/U -- Not a BBB file
+	d2: h1=N/N, h2=N/N, h3=N/N, h4=N/N, h5=N/N?, h6=FIX?, h7=N/N, h8=N/N
+	d3: h1=N/N, h2=N/N?, h3=N/N
+
+adc/0015-iio-ti_am335x_adc-check-if-we-found-the-value.patch
+	d1: h1=N/N, h2=N/N?
+
+adc/0016-MFD-ti_tscadc-disable-TSC-control-register-bits-when.patch
+	d1: N/N
+
+adc/0017-IIO-ADC-ti_adc-Fix-1st-sample-read.patch
+	d1: h1=N/N, h2=FIX or N/U, h3=N/N, h4=N/N
+
+adc/0018-input-ti_tsc-Enable-shared-IRQ-TSC.patch
+	d1: h1=FIX, h2=FIX, h3=N/N
+
+adc/0019-iio-ti_am335x_adc-Add-continuous-sampling-and-trigge.patch
+	d1: h1=FIX? (target file doesn't use work queues),
+		h2=N/N, h3=N/N, h4=N/N, h5=FIX
+		
+adc/0020-iio-ti_am335x_adc-Add-IIO-map-interface.patch
+	d1: FIX (if need IIO map interface)
+
+capes/0012-Workaround-for-bug-in-tscadc-code-that-oopses-with-B.patch
+	d1: N/U -- Not a BBB issue
+
+da8xx-fb/0031-clk-divider-prepare-for-minimum-divider.patch
+	d1: FIX or N/U (this is a future feature, maybe not tested),
+	d2: FIX or N/U ("),
+	d3: FIX or N/U (")
+
+fixes/0006-ti_am335x_tsc-touchscreen-jitter-fix.patch
+	d1: FIX or N/U (crude attmtpt to fix tsc jitter)
+
+not-capebus/0171-clock-Export-__clock_set_parent.patch
+	d1: FIX
+	d2: FIX
+	
+Notes:
+	d1 = diff section 1, etc.
+	h1 = hunk section 1, etc.
+	N/N = patch not needed, changes in target files
+	N/U = patch not used, not relevant to Beagle Black
+	FIX = patch definitely needs fixing
+	FIX? = patch may need fixing
+	
+
+

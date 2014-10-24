@@ -1,0 +1,1395 @@
+
+Archive
+-------
+
+Extract information from "patch archive" files
+
+Archive(path)
+.............
+
+Constructor
+
+|        Args:
+|            path (string): path to patch archive file
+|            
+|        Raises:
+|            PT_ParameterError, PT_NotFoundError
+|        
+|        Notes:
+|             A "patch archive" file lists diff sections from patches that were applied to
+|             produce the associated kernel version. Since the patch archive files can be very large,
+|             we take care to avoid copying or storing data that is not of interest to the user.
+
+sections(filenames)
+...................
+
+Find archive file sections that modify files also modified by our patches
+
+|        Args:
+|            filenames (list): file names referenced in our patches
+|            
+|        Returns:
+|            A list of sections. Each section is a list of strings, in which
+|            the first string identifies the start line number of a diff section,
+|            and the remaining strings are the content of the diff section.
+|            
+|        Raises:
+|            None
+
+
+Checker
+-------
+
+Validate the contents of Linux kernel patch files against
+the files specified in them
+
+Checker(params)
+...............
+
+Constructor
+
+|        Args:
+|            params (dict): parameters
+|                sourcedir  (string,required):       path to source directory
+|                patchdir   (string,required):       path to patch directory
+|                targets    (string/list, optional): target file(s)
+|                indent     (int, optional):         indentation
+|                    default = 3
+|                mode (string, optional): scanning mode
+|                    'full'     : report edit errors only
+|                    'complete' : report status of all edits
+|                    default is 'full' 
+|                find (bool, optional): find missing strings
+|                    default is True
+|                debug (int, optional) debug options
+|                    default is 0
+|            
+|        Raises:
+|            PT_ParameterError
+|                    
+|        Notes:
+|            If '' is passed as sourcedir or patchdir, the caller must supply file
+|            paths to the match method that are accessible from the caller's current dircectory.
+|                
+|            If 'targets' is specified the code will only scan diff sections that
+|            modify the filenames in params['targets]
+
+match(param)
+............
+
+Validate the contents of one or more Linux kernel patch files against a kernel
+
+|        Args:
+|            param (choice):
+|                (string): path to patch file
+|                (list): paths to patch files
+|                
+|        Returns:
+|            A list of strings describing the results of analysis
+|        
+|        Raises:
+|            PT_ParameterError
+|            PT_ParsingError
+
+
+Finder
+------
+
+Find references to patterns you specify in a Linux kernel tree,
+a patch archive file, or in a set of patches
+
+Finder(params)
+..............
+
+Constructor
+
+|        Args:
+|            params (dict): parameters
+|                root_path   (string, required): path of file tree root
+|                file_paths  (list, required):   relative paths of files to search
+|                options (string, optional): display format
+|                    'terse'    show count of matching lines
+|                    'compact'  show line numbers of matching lines
+|                    'full'     show line number and text of matching lines
+|                    'complete' also show matching pattern
+|                    'match'    list only matching text
+|                        default is 'full'
+|                mode (string, optional) search mode
+|                    'file' report results by file
+|                    'pattern' report results by pattern
+|                
+|                trim_paths (bool, optional): remove root portion of paths from returned paths
+|                    default is True
+|                      
+|        Raises:
+|            PT_ParameterError
+|            PT_NotFoundError
+
+match(params)
+.............
+
+Report matches by file to (patterns) found in selected files
+
+|        Args:
+|            filter (dict): Filter parameters
+|                
+|        Returns:
+|            A list of matches in the format specified above
+|        
+|        Raises:
+|            PT_ParameterError
+|                
+|        Notes:
+|            See the Filter object for a description of Filter parameters.
+
+
+Viewer
+------
+
+Display a set of files in a user selected editor
+
+Viewer(params=None)
+...................
+
+Constructor
+
+|        Args:
+|            params (dict, optional): parameters
+|                editor (dict, optional): editor specification
+|                    target    (string, required): name or path for target program
+|                    multifile (bool, required):   can open multiple files in a single invocation
+|                    multiview (bool, required):   can display multiple files in a single window
+|                root (string, optional): a path to prefix to all filenames
+|                wait (bool, optional):   wait for subprocess to exit
+|                    default is False
+|            
+|        Raises:
+|            PT_ParameterError
+|                
+|        Notes:
+|            If editor is not specified, the default editor for the host system is used.
+|            The default editor for Linux is gedit. The default editor for Windows is write
+|            (aka 'WordPad').
+|            If any method is called in a loop, the wait option should be True.
+
+view(files)
+...........
+
+Launch specified editor to view the file(s)
+
+|        Args:
+|            files (list): paths of files to display
+|            check_files(bool): verify target files exist
+|                          
+|        Raises:
+|            PT_ParameterError for any missing files
+
+vp2f(patchname, params)
+.......................
+
+List patch and files it uses
+
+|        Args:
+|            patchname (string): name of patch file
+|            params    (dict):   parameters
+|                patchdir  (string, required): path of patches folder
+|                
+|        Raises:
+|            PT_ParameterError for any missing files
+
+vp2p(patchname, params)
+.......................
+
+Display a patch file and the other patch files that use the same source files
+
+|        Args:
+|            patchname (string): name of patch file
+|            params    (dict):   parameters
+|                patchdir  (string, required): path of patches folder
+|                patchset  (dict, required):   patchset description
+|                
+|        Raises:    
+|            PT_ParameterError for any missing files
+
+vp2a(patchname, archpath, params)
+.................................
+
+Display patch and archive diff sections that use its files
+
+|        Args:
+|            patchname (string): name of patch file
+|            archpath  (string): path to archive file
+|            params    (dict):   parameters
+|                patchdir (string, required): path of patches folder
+|                tempdir  (string, required): path to store temporary data
+|                
+|        Raises:    
+|            PT_ParameterError for any missing files
+|        
+|        Notes:
+|            Launches the editor synchronously, since a temporary file is created to hold
+|            the archive sections.
+
+vcpf(checkpath, patchname, params)
+..................................
+
+List checker output file, patch and files it uses
+
+|        Args:
+|            checkpath (string): path to Checker output file
+|            patchname (string): patch name
+|            params (dict) parameters:
+|                sourcedir (string, required): path of sources folder
+|                patchdir  (string, required): path of patches folder
+|            
+|        Raises:    
+|            PT_ParameterError
+|            PT_NotFoundError
+
+
+Walker
+------
+
+Enumerate paths of selected files in a source tree
+
+Walker(params)
+..............
+
+Constructor
+
+|        Args:
+|            params (dict, required)  parameters:
+|                root_path  (string, required): search root path
+|                incl_dirs  (list, optional):   top level subdirs to include
+|                excl_dirs  (list, optional):   top level subdirs to exclude
+|                incl_files (dict, optional):   include file name filters
+|                excl_files (dict, optional):   exclude file name filters
+|                test_dirs  (bool, optional):   True = include dir in tests
+|                    
+|        Raises:
+|            PT_ParameterError
+|            
+|        Notes:
+|            The "root_path" parameter specifies the root of the search.
+|            If the "incl_dirs" option is specified, only those subdirs of the root will be searched.
+|            If the "excl_dirs" option is specified, those subdirs of the root will not be searched.
+|            If the "incl_files" option is specified, only those filetypes will be enumerated.
+|            If the "excl_files" option is specified, those filetypes will not be enumerated.
+|            If it is desired to search a folder that is a subfolder of an excluded folder,
+|            the search must be split into two operations.
+|            When callback functions need the containing directory to test a file name,
+|            the 'test_dirs' option should be set to True
+|            
+|            Walking a large file tree can take significant time and produce a large amount of data,
+|            but this tendency can be reduced by cleaning the tree of generated files beforehand,
+|            and by applying suitable directory and file filters.   
+
+walk()
+......
+
+The walk starts here
+
+|        Args:
+|            None
+|            
+|        Returns:
+|            A list of matching file paths
+|            
+|        Raises:
+|            None
+
+
+Watcher
+-------
+
+Determine if your patches have been integrated into released kernel versions
+
+Watcher(params)
+...............
+
+Constructor
+
+|        Args:
+|            params (dict): parameters
+|                patchdir  (string, required): path to patch folder
+|                sourcedir (string, required): path to source folder
+|                datadir   (string, required): path to data folder
+|                tempdir   (string, required): path to temp file folder
+|                patchset  (dict, required):   description of patches
+|                
+|        Raises:
+|            PT_ParameterError
+|            PT_NotFoundError
+|        
+|        Notes:
+|            Experience in testing shows a very low probability that an archive
+|            diff section will match any of our patches exactly, so we merely
+|            display the related files.
+
+watch(archpath)
+...............
+
+View files related to archive diff sections
+
+|        Args:
+|            archpath (string): path to patch archive file
+|            
+|        Returns:
+|            None. Output is a series of launches of the Viewer to view the files.
+|            
+|        Raises:
+|            PT_ParameterError
+|            PT_NotFoundError
+
+
+Diff
+----
+
+Extract information from a diff section of a patch file
+
+Diff(strings)
+.............
+
+Constructor
+
+|        Args:
+|            strings (Strings): diff section from a patch file or archive file
+|            
+|        Raises:
+|            PT_ParameterError
+
+
+Hunk
+----
+
+Extract information from a hunk section of a patch file
+
+Hunk(strings)
+.............
+
+Constructor
+
+|        Args:
+|            strings (Strings): hunk section from a patch file or archive file
+
+
+JSONConfig
+----------
+
+Store configuration data obtained from enhanced JSON input files
+
+JSONConfig(params=None)
+.......................
+
+Constructor
+
+|        Args:
+|            params (dict, optional): parameters
+|                filepath  (string, required): path to file with enhanced JSON encoded string, or None
+|                separator (string, optional): char to use as separator in path expressions
+|                    default is '/'
+|                
+|        Raises:
+|            JSONConfigParameterError
+
+__getitem__(key)
+................
+
+Ensure that a slice of our data is returned as a str object,
+when the value is a unicode string, on Python2.x
+
+|        Args:
+|            k (str/unicode):   item index
+|            
+|        Returns:
+|            str(value) when Python is 2.x and value is unicode
+|            otherwise, value
+|            
+|        Raises:
+|            JSONConfigTypeError, JSONConfigKeyError
+
+get(key)
+........
+
+Get top level value or internal value
+
+|        Args:
+|            key (string): path to internal value
+|                        
+|        Returns:
+|            The value addressed by key
+|            
+|        Raises:
+|            JSONConfigTypeError, JSONConfigKeyError
+|            
+|        Notes:
+|            The key argument may be the name of a top level key in the data, or a "path expression".
+|            Such an expression contains one or more instances of '/' or of a user defined separator,
+|            and encodes a path to a node in the dict.
+|            For example, self.get("/mysql_options/admin_profile/data_base") will get the value at
+|                self["mysql_options"]["admin_profile"]["data_base"]
+|                
+|            Values may also be accessed by normal Python indexing of the dict superclass.
+
+set(key, value)
+...............
+
+Set top level value or internal value
+
+|        Args:
+|            key   (string): path to internal value
+|            value (any Python value)
+|                
+|        Returns:
+|            None
+|            
+|        Raises:
+|            JSONConfigTypeError, JSONConfigKeyError
+|            
+|        Notes:
+|            See notes for get method.
+
+add(data)
+.........
+
+Add data to the current config
+
+|        Args:
+|            data (choice):
+|                A string path to a file to load
+|                A string representation of a JSON object
+|                A Python dict
+|        
+|        Returns:
+|            None
+|            
+|        Raises:
+|            OSError or IOError when a file has problems
+|            JSONConfigTypeError, etc, when JSON string is incorrectly formatted
+
+has(key)
+........
+
+Determine if item is in the config data
+
+|            Args:
+|                key (string): path to internal value
+|            
+|            Returns:
+|                True if item was found, else False
+
+
+Patch
+-----
+
+Extract information from a patch file
+
+Patch(path)
+...........
+
+Constructor
+
+|        Args:
+|            path (string): path to patch file
+|            
+|        Raises:
+|            PT_ParameterError
+|            PT_NotFoundError
+|        
+|        Notes:
+|            Commented out diff and hunk sections are omitted.
+
+list_files(patchpath) <staticmethod>
+....................................
+
+List the files referenced by a patch, without duplicates
+
+|        Args:
+|            patchpath (string) path to patch file
+|            
+|        Returns:
+|            list of filenames
+|            
+|        Notes:
+|            A "filename" is the portion of the file's path after the kernel root,
+|            e.g. "drivers/iio/...".
+
+
+PatchSet
+--------
+
+Extract information from a set of patch files
+
+PatchSet(params)
+................
+
+Constructor
+
+|        Args:
+|            params (dict):  parameters
+|                patchdir  (string, required): path to patch directory
+|                patchset  (dict, required):   description of patches in patchdir
+|            
+|        Raises:
+|            PT_ParameterError     
+
+get_file_data()
+...............
+
+Get source file data for patches
+
+|        Args:
+|            None
+|        
+|        Returns:
+|            A mapping of patch names to file names.
+
+get_patch_data()
+................
+
+Get patch data for source files
+
+|        Args:
+|            None
+|        
+|        Returns:
+|            A mapping of file names to patch names.
+
+get_patch_names(params=None)
+............................
+
+Return list of names of patches in our patch set
+
+|        Args:
+|            params (dict, optional): parameters
+|                excl_dirs (list, optional): directories to exclude
+|                incl_dirs (list, optional): directories to include
+|            
+|        Returns:
+|            list of patch names in the order found in patchset
+|                
+|        Notes:
+|            The "name" of a patch is the concatenation of the name of its parent folder
+|            and its filename, as shown in the patchset description.
+|                
+|            If params is None, names of all patches are returned.
+
+get_patch_files(patchname)
+..........................
+
+Return a list of source files referenced in one patch file
+
+|        Args:
+|            patchname (string): name of patch file
+|            
+|        Raises:
+|            PT_ParameterError, PT_NotFoundError
+|            
+|        Notes:
+|            This function may be used to generate file lists for the *Finder*.                     
+
+get_file_patches(filename)
+..........................
+
+Return a list of patch files that refer to one source file
+
+|        Args:
+|            filename (string): name of source file
+|            
+|        Raises:
+|            PT_ParameterError, PT_NotFoundError
+|                
+|        Notes:
+|            This function may be used to generate file lists for the *Matcher*. 
+
+get_patch_patches(patchname)
+............................
+
+Get a list of patches that patchname depends on
+
+|        Args:
+|            patchname (string): name of patch file
+|        
+|        Returns:
+|            A list of names of the parent patches in patchset order
+|            
+|        Raises:
+|            PT_ParameterError, PT_NotFoundError
+|            
+|        Notes:
+|            Patch A depends on patch B when they modify the same files
+|            and patch B precedes patch A in the patch list.
+
+
+PTObject
+--------
+
+PatchTools super class
+
+Provides an identifiable super class for all PatchTools classes.
+Implements common parameter checking functions for the sub classes.
+
+
+Strings
+-------
+
+Provide some useful string like methods for lists of strings
+
+Strings(data=None)
+..................
+
+Constructor
+
+|        Args:
+|            data (list, optional): a list of strings 
+|            
+|        Raises:
+|            StringsParameterError
+
+__getitem__(i)
+..............
+
+Ensure that slices of Strings objects are returned as Strings objects, not lists
+
+|        Args:
+|            i (int):   item index
+|            i (tuple): (start, stop, [step])
+|            
+|        Returns:
+|            Strings(self[i:j])
+|        
+|        Notes:
+|            For mysterious reasons, slice keys can be passed as tuples, not slice objects.
+|            In such cases, we convert the tuples to slices.
+
+find(pattern, begin=None, end=None)
+...................................
+
+Find the first string in our data that starts with (pattern)
+
+|        Args:
+|            pattern (str):  the substring to match
+|            begin   (int):  start index
+|            end     (int):  stop index
+|            
+|        Returns:
+|            Found: the index of matching string
+|            Not found: -1
+|            
+|        Raises:
+|            StringsParameterError
+|                
+|        Notes:
+|            If begin is not specified, it is set to 0
+|            If end is not specified, it is set to len(self).
+|            All strings are left stripped before testing.
+
+match(patterns, begin=None, end=None)
+.....................................
+
+Find the first string in our data that starts with a pattern in (patterns)
+
+|        Args:
+|            patterns (list): The substring to match
+|            begin    (int):  Start index
+|            end      (int):  Stop index
+|            
+|        Returns:
+|            Found: the index of matching string, and the matching pattern
+|            Not found: -1, ''
+|            
+|        Raises:
+|            StringsParameterError
+|                
+|        Notes:
+|            If begin is not specified, it is set to 0
+|            If end is not specified, it is set to len(self).
+|            All strings are left stripped before testing.
+
+rfind(pattern, begin=None, end=None)
+....................................
+
+Find the last string in our data that starts with (pattern)
+
+|        Args:
+|            pattern (str):  the substring to match
+|            begin   (int):  start index
+|            end     (int):  stop index
+|            
+|        Returns:
+|            Found: the index of matching string
+|            Not found: -1
+|            
+|        Raises:
+|            StringsParameterError
+|                    
+|        Notes:
+|            If end is not specified, it is set to -1.
+|            len(self) is added to the value of begin.
+|            All strings are left stripped before testing.
+
+rmatch(patterns, begin=None, end=None)
+......................................
+
+Find the last string in our data that starts with a string in (patterns)
+
+|        Args:
+|            patterns (str): The substrings to match
+|            begin    (int):  Start index
+|            end      (int):  Stop index
+|            
+|        Returns:
+|            Found: the index of matching string, and the matching pattern
+|            Not found: -1, ''
+|            
+|        Raises:
+|            StringsParameterError
+|                    
+|        Notes:
+|            If end is not specified, it is set to -1.
+|            len(self) is added to the value of begin.
+|            All strings are left stripped before testing.
+
+filter(pattern, begin=None, end=None)
+.....................................
+
+Find all strings in our data that start with (pattern)
+
+|        Args:
+|            pattern (str):  the substring to match
+|            begin   (int):  start index
+|            end     (int):  stop index
+|            
+|        Returns:
+|            Found: A list of the indices of the matching strings
+|            Not found: None
+|            
+|        Raises:
+|            StringsParameterError
+|                    
+|        Notes:
+|            If begin is not specified, it is set to 0
+|            If end is not specified, it is set to len(self).
+|            All strings are left stripped before testing.
+
+index(pattern)
+..............
+
+Return indices of strings that exactly match (pattern)
+
+|        Args:
+|            pattern (string): search text
+|            
+|        Raises:
+|            StringsParameterError
+
+lstrip()
+........
+
+Remove leading lines that are empty or whitespace
+
+|        Args:
+|            none
+|            
+|        Returns:
+|            self, to allow chaining to slices, other methods
+
+rstrip()
+........
+
+Remove trailing lines that are empty or whitespace.
+
+|        Args:
+|            none
+|            
+|        Returns:
+|            self, to allow chaining to slices, other methods
+
+partition(splitter)
+...................
+
+Split our data into two parts at a splitter pattern, searching forwards
+
+|        Args:
+|            splitter (str): The substring that splits the parts
+|                
+|        Returns:
+|            splitter was found:
+|                A tuple (head, tail) where head is a Strings object containing the first part,
+|                and tail is a Strings object containing the second part.
+|            splitter was not found:
+|                (self, None)
+|            
+|        Notes:
+|            Example: (head, body) = patch.partition('diff --git ')  
+
+rpartition(splitter)
+....................
+
+Split our data into two parts at a splitter pattern, searching backwards
+
+|        Args:
+|            splitter (str): The substring that splits the parts
+|                
+|        Returns:
+|            splitter was found:
+|                A tuple (body, tail) where body is a Strings object containing the first part,
+|                and tail is a Strings object containing the second part
+|            splitter was not found:
+|                (None, self)
+|            
+|        Notes:
+|            Example: (body, tail) = patch.rpartition('-- ')
+
+split(splitter)
+...............
+
+Split our data into two or more parts at occurrences of a splitter pattern
+
+|        Args:
+|            splitter (str): The substring that splits the parts
+|                
+|        Returns:
+|            A list of Strings objects, each of which contains a part
+|            
+|        Raises:
+|            StringsParameterError
+|                    
+|        Notes:
+|            Example: diffs = body.split('diff --git ') 
+|            This code will split the Strings object 'body' into a list of sections,
+|            each of which starts with a string beginning with ('diff --git ').
+
+extract(begin, end)
+...................
+
+Extract a list of sections tagged by (begin) and (end)
+
+|        Args:
+|            begin (str): section start marker
+|            end   (str): section end marker
+|            
+|        Returns:
+|            A list of Strings objects, one for each extracted section
+|                
+|        Notes:
+|            The begin and end markers are not returned in the output
+|            
+|            Example: sections = strlist.extract('#++', '#--')
+|            This code will extract all strings between '#++' and '#--' in strings.py
+|            (this file) if the file has been read into strlist.
+
+discard(begin, end)
+...................
+
+Remove a list of sections tagged by (begin) and (end)
+
+|        Args:
+|            begin (str): section start marker
+|            end   (str): section end marker
+|            
+|        Returns:
+|            A Strings object.
+|                
+|        Notes:
+|            The begin and end markers are not returned in the output
+
+sort()
+......
+
+Sort our data.
+
+|        Args:
+|            none
+
+unique()
+........
+
+Remove duplicate successive instances of strings in  our data.
+
+|        Args:
+|            none
+|            
+|        Notes:
+|            To remove all duplicates, sort the data first
+
+join(lists) <staticmethod>
+..........................
+
+Join a list of objects into a single Strings object.
+Each object is a list of strings or a Strings object.
+
+|        Args:
+|            lists (list): list of list or Strings objects
+|                
+|        Returns:
+|            A Strings object containing all strings in the lists
+|            
+|        Raises:
+|            StringsParameterError
+|            
+|        Notes:
+|            Example:
+|                list1 = Strings(['a','b'])
+|                list2 = ['c','d']
+|                list3 = Strings.join([list, list2])
+|            This code will join the contents of list1 and list2 in list3.
+
+
+Command
+-------
+
+Execute command in subprocess
+
+Command()
+.........
+
+Constructor
+
+|        Args:
+|            None
+
+sync(cmd)
+.........
+
+Execute subprocess synchronously
+
+|        Args:
+|            cmd (string): shell command to execute
+|            cmd (list):   command arguments to pass
+|                
+|        Returns:
+|            A list of strings:
+|                ['retcode' : 0,
+|                 'output' : '...',
+|                 'errors' : '...'
+|                 ]
+|                 
+|        Raises:
+|            CommandParameterError when command is not a string type
+|                
+|        Notes:
+|            Shell command  is a string like "cd tmp && ls".
+|            Command arguments is a list like ['gedit', 'file1', file2',...]
+|            Output and errors strings are only returned to the caller
+|            when the subprocess returns output or errors.
+
+async(cmd)
+..........
+
+Execute subprocess asynchronously
+
+|        Args:
+|            cmd (string): shell command to execute
+|           
+|        Returns:
+|            None
+|            
+|        Raises:
+|            see sync method above.
+|                
+|        Notes:
+|            see sync method above. 
+
+wait()
+......
+
+Wait for asynchronous subprocess to exit
+
+|        Args:
+|            None
+|            
+|        Returns:
+|            list of result strings
+|            
+|        Raises:
+|            CommandStateError when no subprocess is active    
+
+
+ExceptionHandler
+----------------
+
+Handle exceptions
+
+ExceptionHandler(params=None)
+.............................
+
+Constructor
+
+|        Args:
+|            params (dict): parameters
+|                trace (bool, optional): format exception traceback
+|                    default is True
+|                print (bool): print results
+|                    default is True
+
+
+Helper
+------
+
+Facilitate use of PatchTools's classes
+
+Helper(configpath)
+..................
+
+Constructor
+
+|        Args:
+|            config (dict): configuration data
+
+cmd(command)
+............
+
+Handle Command request
+
+|        Args:
+|            command (string) shell command to execute
+
+find(patterns, params)
+......................
+
+Handle Finder request
+
+|        Args:
+|             patterns (dict) Matcher parameters
+|             params   (dict) Finder parameters 
+
+check(patches, params=None)
+...........................
+
+Handle Checker request
+
+|        Args:
+|            patches (string/list, required) patch file(s)
+|            params  (dict, optional) Checker parameters
+
+walk(params)
+............
+
+Handle Walker request
+
+|        Args:
+|            params (dict, required) Walker parameters
+
+watch(archives, params=None)
+............................
+
+Handle Watcher request
+
+|        Args:
+|            archives (string/list)    archive file path(s)
+|            params   (dict, optional) Watcher parameters
+
+view(files, params=None)
+........................
+
+View specified file(s)
+
+|        Args:
+|            files  (string/list) file path(s)
+|            params (dict, optional) Viewer parameters
+|                
+|        Notes:
+|            If params is not specified, the default file viewer is used.
+
+vp2f(patchname, params=None)
+............................
+
+View patch and the source files it references
+
+|        Args:
+|            patchname (string) patch file name
+|            params    (dict, optional) Viewer parameters
+
+vf2p(filepath, params=None)
+...........................
+
+View source file and the patches that reference it
+
+|        Args:
+|            filepath (string) file path
+|            params   (dict, optional) Viewer parameters
+
+vp2p(patchname, params=None)
+............................
+
+View patch and other patches that reference its files
+
+|        Args:
+|            patchname   (string) patch name
+|            params      (dict, optional) Viewer parameters
+
+vp2a(patchname, archivepath, params=None)
+.........................................
+
+View patch and archive diff sections that reference its files:
+
+|        Args:
+|            patchname   (string) patch name
+|            archivepath (string) archive file path
+|            params      (dict, optional) Viewer parameters
+
+vcpf(checkpath, patchname, context=None, params=None)
+.....................................................
+
+View Checker output, patch file and the source files it references,
+one at a time.
+
+|        Args:
+|            checkpath (string) checker output file path
+|            patchname (string) patch name
+|            context   (dict)   source, dir, patchdir, etc.
+|            params    (dict, optional) Viewer parameters
+|        
+|        Notes:
+|            If context is not passed, config['defaults'] is used.
+
+
+Matcher
+-------
+
+Implement filter selection of strings
+
+Matcher(params)
+...............
+
+Constructor
+
+|        Args:
+|            params (dict): parameters
+|                match    (list, optional): string match pattern(s)
+|                prefix   (list, optional): string start pattern(s)
+|                suffix   (list, optional): string end pattern(s)
+|                substr   (list, optional): substring pattern(s)
+|                regexp   (list, optional): regular expression pattern(s)
+|                funcs    (list, optional): callback function(s)
+|            
+|        Raises:
+|            PT_ParameterError on invalid parameters
+|                
+|        Notes:
+|            At least one option must be specified for the filter to have an effect.         
+|            Regular expression pattern strings should be coded using the r"..." string form.
+
+__call__(string)
+................
+
+Try to match string to stored filter
+
+|        Args:
+|            string (string): string to match
+|            
+|        Returns:
+|            text of the matching pattern, or None
+
+
+Functions
+---------
+
+Utility functions
+
+Linux source files and patches that describe them may contain byte values
+that are legal 'Latin-1' (aka ISO-8859-1) character codes, but not legal
+'UTF-8' start bytes. For example, 0xb3 is the 'Latin-1' character for the
+cube symbol, i.e. a superscript 3. For this reason the file access functions
+below default to the 'latin_1' encoding.
+
+is_windows() <staticmethod>
+...........................
+
+Report whether the host system is Windows
+
+|        Args:
+|            None
+|        
+|        Returns:
+|            True if running on Windows, else False
+
+is_python3() <staticmethod>
+...........................
+
+Report whether the Python version is >= 3
+
+|        Args:
+|            None
+|        
+|        Returns:
+|            True if running on Python 3, else False
+
+file_size(path) <staticmethod>
+..............................
+
+Determine size of the file/folder at (path)
+
+|        Args:
+|            path (string): file path
+|        
+|        Returns:
+|            size (int): file size in bytes
+
+is_dir(path) <staticmethod>
+...........................
+
+Determine whether the object at (path) is a directory
+
+|        Args:
+|            path (string): file path
+|        
+|        Returns:
+|            True if the path exists and is a directory.
+
+is_file(path) <staticmethod>
+............................
+
+Determine whether the object at (path) is a file
+
+|        Args:
+|            path (string): file path
+|        
+|        Returns:
+|            True if the path exists and is a regular file.
+
+join_path(head, tail) <staticmethod>
+....................................
+
+Form a path from (head) and (tail).
+
+|        Args:
+|            head (string): path prefix
+|            tail (string): path suffix
+|        
+|        Returns:
+|            string: the resulting path
+|        
+|        Notes:
+|            This function allows head and tail to contain embedded '/' characters.
+
+trim_path(head, path) <staticmethod>
+....................................
+
+remove (head) from (path.
+
+|        Args:
+|            head (string): path prefix
+|            path (string): path
+|        
+|        Returns:
+|            string: the resulting path
+
+read_file(path, enc='latin_1') <staticmethod>
+.............................................
+
+Read file data.
+
+|        Args:
+|            path (string): file path
+|        
+|        Returns:
+|            File data as a single object.
+
+read_lines(path, enc='latin_1') <staticmethod>
+..............................................
+
+Read file lines.
+
+|        Args:
+|            path (string): file path
+|        
+|        Returns:
+|            File data as a list of '\n' terminated strings.
+
+read_strings(path, enc='latin_1') <staticmethod>
+................................................
+
+Read file strings.
+
+|        Args:
+|            path (string): file path
+|        
+|        Returns:
+|            File data as a list of strings.
+
+write_file(text, path, enc='latin_1') <staticmethod>
+....................................................
+
+Write text to file at path
+
+|        Args:
+|            path (string): file path
+|        
+|        Returns:
+|            None
+
+write_strings(strings, path, enc='latin_1') <staticmethod>
+..........................................................
+
+Write strings to file at(path)
+
+|        Args:
+|            path (string): file path
+|        
+|        Returns:
+|            None
+|        
+|        Notes:
+|            If (strings) intentionally has empty strings, using str.join() would
+|            delete them, which may cause problems for readers of the file.
+|            Here we write the strings one at a time.
+
+get_string_filename(string) <staticmethod>
+..........................................
+
+Extract filename from string
+
+|        Args:
+|            string (string): input string
+|        
+|        Returns:
+|            filename (string): filename substring
+|        
+|        Notes:
+|            Supported string formats:
+|                In patches:
+|                    'diff --git a/foo... b/foo...'
+|                    'diff -u -R -n foo... foo...'
+|                    '--- foo...'
+|                    '+++ foo...
+|                In a Checker output file:
+|                    'DIFF: diff --git a/arch/powerpc/mm/numa.c b/arch/powerpc/mm/numa.c'
+
+normalize_string(string, strip=True) <staticmethod>
+...................................................
+
+Replace all internal string whitespace by single spaces
+
+|        Args:
+|            string (string): input string
+|            strip  (bool):   True = strip the string first
+
+string_to_words(string) <staticmethod>
+......................................
+
+Split a string into words on space boundaries.
+
+|        Args:
+|            string (string): input string
+|        
+|        Notes:
+|            After splitting, words are stripped of whitespace and empty words
+|            are removed.
+
+is_string_type(param) <staticmethod>
+....................................
+
+Determine if an object is a string
+
+|        Args:
+|            param (unknown): input object
+|        
+|        Returns:
+|            True if the object is a string, else False
+|        
+|        Notes:
+|            Python2 has str, unicode and StringTypes, while Python3
+|            has only str.
+

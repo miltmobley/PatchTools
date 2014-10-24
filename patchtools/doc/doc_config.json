@@ -1,0 +1,34 @@
+{
+    "docroot" : "_rest",
+    "srcroot" : "../lib",
+	
+	"manual" : [
+		"head.txt",  
+		"api.txt",
+		"apx.txt"
+		],
+		
+	"sources" : [
+		"archive.py",
+		"checker.py",
+		"finder.py",
+		"viewer.py",
+		"walker.py",
+		"watcher.py",
+		"diff.py",
+		"hunk.py",
+		"jsonconfig.py",
+		"patch.py",
+		"patchset.py",
+		"ptobject.py",
+		"strings.py",
+		"command.py",
+		"exceptions.py",
+		"helper.py",
+		"matcher.py",
+		"functions.py"
+		]		
+}
+	
+	
+	

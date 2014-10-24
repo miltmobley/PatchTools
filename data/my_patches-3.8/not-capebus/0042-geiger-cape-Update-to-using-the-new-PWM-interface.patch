@@ -1,0 +1,42 @@
+From defe8fb92ab7b20d16e2da6cecc0ecacb3ed8f08 Mon Sep 17 00:00:00 2001
+From: Pantelis Antoniou <panto@antoniou-consulting.com>
+Date: Tue, 8 Jan 2013 21:05:27 +0200
+Subject: [PATCH 042/184] geiger-cape: Update to using the new PWM interface.
+
+The DT PWM interface has changed; update.
+
+Signed-off-by: Pantelis Antoniou <panto@antoniou-consulting.com>
+---
+ firmware/capes/cape-bone-geiger-00A0.dts |    9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/firmware/capes/cape-bone-geiger-00A0.dts b/firmware/capes/cape-bone-geiger-00A0.dts
+index 4003161..67ec568 100644
+--- a/firmware/capes/cape-bone-geiger-00A0.dts
++++ b/firmware/capes/cape-bone-geiger-00A0.dts
+@@ -36,6 +36,13 @@
+ 		};
+ 	};
+ 
++	fragment@2 {
++		target = <&epwmss1>;
++		__overlay__ {
++			status = "okay";
++		};
++	};
++
+ 	fragment@1 {
+ 		target = <&ehrpwm1>;
+ 		__overlay__ {
+@@ -43,7 +50,7 @@
+ 		};
+ 	};
+ 
+-	fragment@2 {
++	fragment@3 {
+ 		target = <&ocp>;
+ 		__overlay__ {
+ 
+-- 
+1.7.9.5
+

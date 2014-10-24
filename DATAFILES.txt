@@ -1,0 +1,61 @@
+[
+	["patchtools/doc", [
+		"conf.py",
+		"doc_config.json",
+		"get_doc.py",
+		"index.rst",
+		"make1html",
+		"Makefile"
+	]],
+	
+	["patchtools/doc/_build/singlehtml", ["index.html"]],
+	
+	["patchtools/doc/_build/singlehtml/_static", [
+		"ajax-loader.gif",
+		"basic.css",
+		"comment-bright.png",
+		"comment-close.png",
+		"comment.png",
+		"default.css",
+		"doctools.js",
+		"down.png",
+		"down-pressed.png",
+		"file.png",
+		"jquery.js",
+		"minus.png",
+		"plus.png",
+		"pygments.css",
+		"searchtools.js",
+		"sidebar.js",
+		"up.png",
+		"up-pressed.png",
+		"underscore.js",
+		"websupport.js"
+	]],
+	
+	["patchtools/doc/_rest", ["api.txt","apx.txt","head.txt"]],
+			                         
+	["patchtools/examples/capemgr/quilt", ["series","README.txt"]],
+	["patchtools/examples/capemgr/quilt/checks", ["README.txt"]],
+	["patchtools/examples/capemgr/quilt/drivers/misc/cape/beaglebone", ["capemgr.c"]],
+	["patchtools/examples/capemgr/quilt/patches/capes", [
+		"0008-capemgr-Priority-on-capemgr.enable_partno-option.patch"
+	]],
+	["patchtools/examples/capemgr/quilt/patches/not-capebus", [
+		"0030-capemgr-Beaglebone-capemanager.patch",
+   		"0070-capemgr-Remove-__devinit-__devexit.patch",
+   		"0103-bone-capemgr-Make-sure-cape-removal-works.patch",
+   		"0104-bone-capemgr-Fix-crash-when-trying-to-remove-non-exi.patch",
+   		"0116-bone-capemgr-Force-a-slot-to-load-unconditionally.patch",
+   		"0128-capemgr-Added-module-param-descriptions.patch",
+   		"0151-capemgr-Implement-disable-overrides-on-the-cmd-line.patch"
+   	]],
+   	["patchtools/examples/capemgr/quilt/patches/resetctrl", [
+   		"0002-capemgr-Implement-cape-priorities.patch"
+   	]],
+   	["patchtools/examples/capemgr/quilt/patches/resources", [
+   		"0001-bone-capemgr-Introduce-simple-resource-tracking.patch",
+   		"0005-capemgr-Add-enable_partno-parameter.patch",
+   		"0023-capemgr-Retry-loading-when-failure-to-find-firmware.patch"
+   	]]
+]

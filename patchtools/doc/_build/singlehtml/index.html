@@ -1,0 +1,3113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PatchTools 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="None" href="index.html#document-index" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li><a href="index.html#document-index">PatchTools 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="toctree-wrapper compound">
+<span id="document-_rest/manual"></span><div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>PatchTools is a tool to evaluate patches for inclusion into source trees managed by
+the GIT source code control system, notably the Linux kernel. The scenario in which
+PatchTools is intended to be used is:</p>
+<ul class="simple">
+<li>You have a patch set that was developed on differences detected between an old
+source version &#8220;a&#8221; and a new source version &#8220;b&#8221;.</li>
+<li>You have a different source version &#8220;c&#8221; to which you wish to apply these patches.</li>
+<li>You don&#8217;t want to, or can&#8217;t switch, to an older source version because doing so
+would make important features, bug fixes, etc. disappear.</li>
+<li>You may want to work with snapshot archives of GIT source trees instead of using GIT
+if you don&#8217;t plan to upstream any changes you make, if you don&#8217;t plan to make any
+changes, or if you don&#8217;t want to use GIT for local source code management.</li>
+</ul>
+<p>Using &#8220;git am&#8221; or quilt to apply the patches often will not work because:</p>
+<ul class="simple">
+<li>The lines specified in a patch are missing or elsewhere in the same file in tree &#8220;c&#8221;.</li>
+<li>The &#8220;a&#8221; or &#8220;b&#8221; file does not exist in a tree where it is supposed to be present.</li>
+<li>The &#8220;a&#8221; or &#8220;b&#8221; file is present in a tree where it is supposed to be absent.</li>
+<li>A later patch in your set fails because it depends on an early patch that failed.</li>
+</ul>
+<p>Often these problems are caused by the integration of other patches into the &#8220;c&#8221; source tree
+that modified the same files as your patches, thus invalidating the line numbers in
+your patches.</p>
+<p>PatchTools is primarily designed for use with Linux patches, but can be used with any software system
+that uses GIT for source code control.</p>
+<p>PatchTools assumes you have appropriate permissions to access any of the files referenced
+by PatchTools modules.</p>
+<p>PatchTools has been tested on Linux Mint 16, using both Python 2.7.5 and 3.3.</p>
+</div>
+<div class="section" id="installation-setup">
+<h1>Installation/Setup<a class="headerlink" href="#installation-setup" title="Permalink to this headline">¶</a></h1>
+<p>There are two modes of installation: to one of your Python distributions, and as a
+stand alone source tree.</p>
+<div class="section" id="python-installation">
+<h2>Python Installation<a class="headerlink" href="#python-installation" title="Permalink to this headline">¶</a></h2>
+<p>PatchTools may be installed into one of your Python distributions using pip or easy_install.
+It may also be installed from source into a distribution by entering &#8216;sudo python setup.py install&#8217;
+or &#8216;sudo python3 setup.py install&#8217; in a shell while you are located in the root source folder.</p>
+<p>If you install to a Python2.x distribution, the Python modules will be placed, for example, in
+&#8216;/usr/local/lib/Python2.7/dist-packages/patchtools&#8217;, and there will be a metadata file
+&#8216;patchtools-1.0-egg-info&#8217; file in the same folder to describe the package. The doc and examples
+data files will be placed in a &#8216;/usr/local/patchtools&#8217; folder.</p>
+<p>If you install to a Python3.x distribution, the Python modules will be placed, for example,
+in &#8216;/usr/local/lib/Python3.3/site-packages/patchtools, and there will be a metadata file
+&#8216;patchtools-1.0-egg-info&#8217; file in the same folder to describe the package. The doc and
+examples data files will be placed in the same &#8216;/usr/local/patchtools&#8217; folder.</p>
+</div>
+<div class="section" id="standalone-source">
+<h2>Standalone Source<a class="headerlink" href="#standalone-source" title="Permalink to this headline">¶</a></h2>
+<p>To use PatchTools as a stand alone source tree, download the tarball, and extract its files to a suitable
+location. Then you must create a PYTHONPATH environment variable as described in the &#8220;System Considerations&#8221;
+section below.</p>
+<p>The software may also be imported into an Eclipse-PyDev project using the &#8216;<a class="reference external" href="File:Import">File:Import</a>&#8216; menu and the
+&#8216;File System&#8217; option. Ensure that the Eclipse value of PYTHONPATH is set to the parent folder of the
+source tree. Note that if you select a Python3 interpreter, the Command module, which is used by the
+Viewer, will not be able to launch a gedit that is not Python3 compatible. The causes for this are
+unknown, but PyDev is suspected, since such requests work properly in a shell.</p>
+</div>
+<div class="section" id="data-files">
+<h2>Data Files<a class="headerlink" href="#data-files" title="Permalink to this headline">¶</a></h2>
+<p>After installing PatchTools, you must set up some test data. Due to the large number of files contained
+in a Linux kernel, and in some patch sets, test data is not included in the release.</p>
+<p>In a suitable location create a &#8216;data&#8217; folder with these sub folders:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>archives</dt>
+<dd>To hold any patch archive files you download from kernel.org, etc.</dd>
+<dt>patchset</dt>
+<dd>A folder to contain a tree of patches. You may have more than one such folder,
+if they have different names.</dd>
+</dl>
+</div></blockquote>
+<p>Download any patch archive files to the archives folder.</p>
+<p>Download any patch sets to the patchset folder(s).</p>
+<p>Download any source trees (e.g. Linux kernels) to convenient locations. It is not
+recommended to store a Linux kernel in an Eclipse workspace, due to the large number
+of files a kernel contains.</p>
+<p>Finally create suitable config.json files to describe and link to the data. See the config.json files
+in the examples folders for typical contents.</p>
+</div>
+</div>
+<div class="section" id="modules">
+<h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h1>
+<p>You can use PatchTools can speed up the process of determining suitability of your patches
+to a new kernel by:</p>
+<ul class="simple">
+<li>Using the <em>Walker</em> to enumerate a useful subset of files in your kernel tree.</li>
+<li>Using the <em>Finder</em> to identify files that have specific content.</li>
+<li>Using the <em>Checker</em> to determine the compatibility of the patch info to your target kernel.</li>
+<li>Using the <em>Watcher</em> to monitor patch archive files distributed with newer kernels.</li>
+<li>Using the <em>Viewer</em> to edit related files simultaneously.</li>
+<li>Using the <em>Helper</em> utilities to speed development of these procedures.</li>
+</ul>
+<div class="section" id="major-modules">
+<h2>Major Modules<a class="headerlink" href="#major-modules" title="Permalink to this headline">¶</a></h2>
+<p>The finder module implements a class <em>Finder</em> to facilitate searching file trees for patterns of interest to you.</p>
+<p>The checker module implements a class <em>Checker</em> to compare the contents of patch
+files to the source files they reference. <em>Checker</em> objects can be used to determine if
+the changes in a patch are compatible with your target kernel.</p>
+<p>The viewer module implements a class <em>Viewer</em> to facilitate editing patches and the files they
+reference. Methods are implemented to handle special cases such as displaying a patch and
+the files referenced by the patch.</p>
+<p>The walker module implements a class <em>Walker</em> to allow enumeration of selected directories and files
+in a file tree. Both directories and specific file types may be included in or excluded from the results.</p>
+<p>The watcher module implements a class <em>Watcher</em> to compare the contents of patch
+files to a &#8220;patch archive&#8221; file associated with a kernel release. You can use the <em>Watcher</em>
+to determine if any of your patches have been integrated into newer kernels than the one on
+which the patches were developed.</p>
+<p>The helper module implements a class <em>Helper</em> to ease the task of assembling the fairly
+numerous required and optional parameters of the modules listed above. It provides wrapper
+functions for the modules, and some useful utility functions.</p>
+</div>
+<div class="section" id="supporting-modules">
+<h2>Supporting Modules<a class="headerlink" href="#supporting-modules" title="Permalink to this headline">¶</a></h2>
+<p>The archive module implements a class <em>Archive</em> to extract information from &#8220;patch archive&#8221; files
+associated with kernel releases.</p>
+<p>The command module implements a class <em>Command</em> to provide a simple wrapper for the Python subprocess module.</p>
+<p>The functions module implements a class <em>Functions</em> to provide various utility functions.</p>
+<p>The jsonconfig module implements a class <em>JSONConfig</em> to allow application configuration
+using enhanced JSON data files.</p>
+<p>The strings module implements a class <em>Strings</em> to provide useful string like methods for
+lists of strings.</p>
+</div>
+<div class="section" id="archive">
+<h2>Archive<a class="headerlink" href="#archive" title="Permalink to this headline">¶</a></h2>
+<p>Archive objects are used by the <em>Watcher</em> to extract information from &#8220;patch archive&#8221; files
+provided by kernel.org for their kernel releases. The files contain a list of the patch diff
+sections that were applied to obtain the release version. See Appendix B for more information.</p>
+</div>
+<div class="section" id="checker">
+<h2>Checker<a class="headerlink" href="#checker" title="Permalink to this headline">¶</a></h2>
+<p><em>Checker</em> objects compare the contents of patch files to the source files they reference.
+Checker objects are used to determine if the changes in a patch are compatible with your target kernel.</p>
+<p>The <em>Checker</em> class accomplishes its goals by the following steps:</p>
+<ul class="simple">
+<li>The patch file is read and parsed into a Patch object.</li>
+<li>The path specifications in the &#8216;diff&#8217; sections are verified to match, and the files
+they reference to exist or not exist in the source tree as appropriate.</li>
+<li>The line number specifications in the &#8216;hunks&#8217; are verified to fall within
+the numbers of actual lines in the files they reference.</li>
+<li>The edit changes are tested against the &#8220;c&#8221; version of file.</li>
+</ul>
+<p>The <em>Checker</em> has two primary modes of operation:</p>
+<ul class="simple">
+<li>In &#8216;full&#8217; mode, all errors are reported, but lines that passed testing are not.</li>
+<li>In &#8216;complete&#8217; mode, a status is reported for each hunk edit line.</li>
+</ul>
+<p>The <em>Checker</em> has several optional features:</p>
+<ul class="simple">
+<li>If the &#8216;find&#8217; option is True, the code will attempt to find missing lines in the
+target file. If no matches are found in a hunk, the program will attempt to find
+instances of the hunk&#8217;s &#8216;note&#8217; in the target file. But the search is limited to
+&#8216;landmark&#8217; lines, i.e. those lines that are expected to be unique in the file.
+Due to the complexity of typical C code, non relevant matches may be reported
+even for complicated expressions.</li>
+<li>The &#8216;targets&#8217; option can be used to limit checking to diffs that reference specific files.</li>
+</ul>
+<p>See the &#8216;Checker&#8217; section of the API documentation for call details.</p>
+<div class="section" id="additional-notes">
+<h3>Additional Notes<a class="headerlink" href="#additional-notes" title="Permalink to this headline">¶</a></h3>
+<p>Since various mail systems and editors can corrupt the patch files as they are in transit,
+the <em>Checker</em> normalizes the patch path lines (&#8220;&#8212; ...&#8221;, &#8220;+++ ...&#8221;), the &#8216;diff&#8217; lines
+(&#8220;diff &#8211;git ...&#8221;) and the hunk range lines (&#8220;&#64;&#64; ...&#8221;) before splitting them
+for extraction. The normalization consists of replacing all tabs by spaces
+and replacing multiple spaces between words of a line by single spaces.</p>
+<p>The <em>Patch</em> parsing logic will discard any patch lines that have been commented out by surrounding them
+with lines containing only &#8216;&#8221;&#8220;&#8221;&#8217;. See the &#8216;Patch&#8217; section of the API documentation for
+more details. This feature can be used to narrow the focus of your investigation to a small
+set of patches and files. But if you plan to use &#8216;git am&#8217; on a patch later, you should do
+the commenting in a copy of the patch.</p>
+</div>
+<div class="section" id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<p>To start a test against your target kernel, you may execute:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">f</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;dts_patch_refs.lst&quot;</span><span class="p">)</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;defaults&#39;</span><span class="p">],</span> <span class="p">{</span> <span class="s">&quot;mode&quot;</span> <span class="p">:</span> <span class="s">&quot;full&quot;</span><span class="p">,</span> <span class="s">&quot;find&quot;</span> <span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="p">}))</span>
+<span class="n">h</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s">&quot;match_dts.txt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Assuming that you have used the <em>Finder</em> to locate patches that refer to some DTS files,
+and saved the results into &#8220;dts_patch_refs.lst&#8221;, this code will check those patches against
+your kernel version.</p>
+<p>See the &#8216;Checker&#8217; section of the API documentation for further info on its parameters
+and methods.</p>
+<p>See &#8216;Appendix E - Checker Output&#8217; for explanation of <em>Checker</em> output.</p>
+</div>
+<div class="section" id="recommended-usage-strategy">
+<h3>Recommended Usage Strategy<a class="headerlink" href="#recommended-usage-strategy" title="Permalink to this headline">¶</a></h3>
+<p>If the <em>Checker</em> is used on all patches in a large set, it can provide you with a very large amount
+of bad news concerning the state of your patches, in part because it does not take into account
+dependencies between patches. It is useful to narrow the scope of your investigations to a subsystem,
+group of patches or group of files to analyze. If you decide to fix a series of related patches,
+you should fix the first one in commit order, test the others again to see if any problems have been
+resolved, and repeat this process down to the last patch.</p>
+<p>The <em>Walker</em> and <em>Finder</em> can be used to generate small lists of files related to specific subsystems, based
+on matches to text strings such as &#8220;am33xx&#8221;, etc:</p>
+<div class="highlight-python"><div class="highlight"><pre>l = h.load(&quot;patch_names.lst&quot;)
+m = { &quot;substr&quot; : [&quot;am335x-bone&quot;, &quot;am33xx.dtsi&quot;, &quot;tps65217.dtsi&quot; ],
+f = h.find(m, { &quot;root_path&quot; : c[&#39;patchdir&#39;], &quot;file_paths&quot; : l, &quot;format&quot; : &quot;files&quot; })&#39;,
+h.save(f, &quot;dts_patch_refs.lst&quot;)&#39;
+</pre></div>
+</div>
+<p>The <em>Checker</em> can be used on one or a few of these files at a time:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">f</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;dts_patch_refs.lst&quot;</span><span class="p">)</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">PatchSet</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;defaults&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">sort_patches</span><span class="p">({</span> <span class="s">&quot;patches&quot;</span> <span class="p">:</span> <span class="n">f</span><span class="p">,</span> <span class="s">&quot;order&quot;</span> <span class="p">:</span> <span class="s">&quot;patchset&quot;</span> <span class="p">})</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;defaults&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">{</span> <span class="s">&quot;find&quot;</span> <span class="p">:</span> <span class="bp">True</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>Note that the <em>Walker</em> and <em>Finder</em> do not return lists of patch names in patchset order, which is supposed
+to be the commit order needed for successful use of &#8216;git am&#8217;.</p>
+<p>If the <em>Checker</em> &#8216;targets&#8217; option is used, the <em>Checker</em> will only scan diff sections that modify the files
+specified in the targets list. For example, you could select BeagleBoard related device tree files for investigation:</p>
+<div class="highlight-python"><div class="highlight"><pre>f = h.load(&quot;dts_patch_refs.lst&quot;)
+g = h.PatchSet(c[&#39;defaults&#39;]).sort_patches({ &quot;patches&quot; : f, &quot;order&quot; : &quot;patchset&quot; })
+t = [&quot;am335x-bone.dts&quot;, &quot;am335x-boneblack.dts&quot;, &quot;am335x-bone-common.dtsi&quot;,
+     &quot;am33xx.dtsi&quot;, &quot;am33xx-clocks.dtsi&quot;, &quot;tps65217.dtsi&quot;, &quot;Makefile&quot;]
+d = h.check(g, h.extend(c[&#39;defaults&#39;], { &quot;find&quot; : True, &quot;targets&quot; : t }))
+h.write(d, &quot;dts_matches.txt&quot;)&#39;
+</pre></div>
+</div>
+<p>When the <em>Checker</em> encounters a diff file name that is not in its targets list, it will issue a message like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># SKIPPING DIFF: &quot;diff --git a/arch/arm/boot/dts/am335x-bone.dts ...</span>
+</pre></div>
+</div>
+<p>The <em>Patch</em> module used by the <em>Checker</em> to parse patches will discard any patch lines that are surrounded
+by lines containing only &#8216;&#8221;&#8220;&#8221;&#8217;. If you observe that an initial <em>Checker</em> report indicates that all the errors
+in a hunk are like &#8216;&#8220;delete&#8221; line not found&#8217; or &#8216;&#8220;merge&#8221; line not found&#8217; and that the target file does not have
+the specified &#8220;delete&#8221; lines, or that &#8220;add&#8221; lines are already in the target file, you can comment out the diff
+or hunk to further narrow the scope of your investigation to hunks or diffs that actually need to be fixed.
+This strategy was used heavily in Example 5 described below.</p>
+<p>If all diffs in a patch are commented out, the <em>Checker</em> will issue a message like:</p>
+<div class="highlight-python"><div class="highlight"><pre>INFO:  skipping empty patch
+</pre></div>
+</div>
+<p>Some example uses of this feature are:</p>
+<blockquote>
+<div><p>To comment out a diff for a file in which you are not interested:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">N/U not BeagleBone Black files</span>
+<span class="sd">diff --git a/arch/arm/boot/dts/am335x-bone.dts b/arch/arm/boot/dts/am335x-bone.dts</span>
+<span class="sd">...</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>To comment out a diff or a hunk which is not needed:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">N/N am33xx.dtsi has the add lines and more values</span>
+<span class="sd">diff --git a/arch/arm/boot/dts/am33xx.dtsi b/arch/arm/boot/dts/am33xx.dtsi</span>
+<span class="sd">...</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>The use of &#8216;N/N&#8217; and other codes to start explanatory notes is conventional, and is not interpreted by the software.</p>
+<p>The &#8216;vcpf&#8217; (view checker output, patch and its files) function of the <em>Helper</em> can be very helpful in determining
+if a patch is correct or if it is needed.</p>
+<p>See the files in the &#8220;examples&#8221; folder for complete usage examples.</p>
+</div>
+</div>
+<div class="section" id="command">
+<h2>Command<a class="headerlink" href="#command" title="Permalink to this headline">¶</a></h2>
+<p>Command objects provide a simple wrapper for the Python subprocess module.
+Command execution can be synchronous, or asynchronous. Normally, synchronous mode
+will be used by the <em>Helper</em>, except that most of its view commands use asynchronous mode.</p>
+<p>Commands may be passed as strings or as lists of arguments.</p>
+<p>Command strings are executed in shell mode:</p>
+<div class="highlight-python"><div class="highlight"><pre>cd ~;pwd;ls
+</pre></div>
+</div>
+<p>There appear to be some limitations to this approach, as in a command string like:</p>
+<div class="highlight-python"><div class="highlight"><pre>cd ~; source .profile;cdlsk
+</pre></div>
+</div>
+<p>where &#8216;cdlsk&#8217; is an alias defined in .profile:</p>
+<ul>
+<li><dl class="first docutils">
+<dt>The shell will not be able to find .profile unless you reference it as &#8216;./.profile&#8217;</dt>
+<dd><p class="first last">or &#8216;~/.profile&#8217;.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">The &#8216;cdlsk&#8217; alias will not be recognized.</p>
+</li>
+<li><p class="first">You cannot split the command into multiple invocations because the environment created
+by &#8216;source ./.profile&#8217; will be lost when the sub process exits.</p>
+</li>
+<li><p class="first">Commands that normally produce output organized in columns in an interactive shell,
+e.g. &#8216;ls&#8217;, will instead produce a list of items separated by &#8216;\n&#8217; characters.</p>
+</li>
+</ul>
+<p>The usage of stdout and stderr by Linux programs is variable, for example:</p>
+<blockquote>
+<div><ul class="simple">
+<li>bash may return zero, indicating success, but also return error output.</li>
+<li>wget returns normal output on stderr.</li>
+</ul>
+</div></blockquote>
+<p>Some programs use extended ASCII (aka Latin-1) characters (i.e. ord(ch) &gt;= x80 in Python terms)
+in their output. For example, certain commands surround filenames with left single
+quote and right single quote characters. Even though Eclipse and PyDev can display such
+characters, Python3 will convert them to hexadecimal escape sequences (e.g. lsquo is represented as &#8216;\xe2\x80\x98&#8217;).
+The <em>Command</em> class converts lsquo and rsquo to &#8216; as needed.</p>
+<p>Python2.7 returns stdout and stderr data as strings, while Python3.x returns them as byte arrays.
+Command translates the values to strings as needed.</p>
+<p>See the &#8216;Command&#8217; section of the API for call details.</p>
+</div>
+<div class="section" id="finder">
+<h2>Finder<a class="headerlink" href="#finder" title="Permalink to this headline">¶</a></h2>
+<p><em>Finder</em> objects try to find references to patterns you specify in a file or a file tree.
+For each pattern you select, the <em>Finder</em> will return a list of references it finds in the target file or folder.</p>
+<p>Unlike programs such as ctags and cscope, the <em>Finder</em> does not attempt to index your entire software tree,
+but instead focuses on the folders, files and text patterns you specify.</p>
+<p>Either absolute or relative paths may be used in specifying the search root.
+When relative paths are used, they must be accessible from the caller&#8217;s current directory.</p>
+<p>Using common patterns such as &#8216;dma&#8217; may produce a large amount of output,
+particularly if you set the search root to the root of a kernel tree, so your choices of
+root and patterns should be made with care.</p>
+<p>See the &#8216;Finder&#8217; section of the API documentation for more information on the class methods.</p>
+</div>
+<div class="section" id="jsonconfig">
+<h2>JSONConfig<a class="headerlink" href="#jsonconfig" title="Permalink to this headline">¶</a></h2>
+<p>A <em>JSONConfig</em> object holds application configuration data taken from enhanced JSON encoded files.</p>
+<p>The JSON files may contain line comments and block comments.</p>
+<p>Line comments are lines that start with &#8216;#&#8217; (ignoring leading white space),
+and will be removed in file loading.</p>
+<p>Block comments are coded by inserting a line with only &#8220;&#8221;&#8221; before and after the lines to be commented out.
+Any lines between such lines are removed in file loading.</p>
+<p>Once loaded the object may be accessed by key indexing of its dict super class instance, or by use of
+the get and set methods. These two methods support convenient multilevel indexing by the use of
+&#8220;path expressions&#8221;. For example, &#8216;...get(&#8220;mysql_options/admin_profile/data_base&#8221;&#8217; will
+return the value of self[&#8220;mysql_options&#8221;][&#8220;admin_profile&#8221;][&#8220;data_base&#8221;]. The user can specify the path
+separator character in the &#8216;separator&#8217; option passed to the constructor.</p>
+<p>Python&#8217;s JSON loader strictly requires the data to have correct JSON syntax, and will
+generate exceptions if it doesn&#8217;t. To avoid confusing users by presenting them with
+line numbers in the stripped line set, JSONConfig will catch exceptions raised by the JSON decoder,
+map the exception line numbers back to their equivalents in the original file,
+and reraise the exceptions as JSONConfigError objects.</p>
+<p>On Python 2.x, the get method will translate unicode dict values to str objects.</p>
+<p>See the &#8216;JSONConfig&#8217; section of the API doumentation for call details.</p>
+<p>See the test*.py programs in the examples folder, and the &#8216;__init__&#8217; method of the <em>Helper</em> for typical usage.</p>
+</div>
+<div class="section" id="matcher">
+<h2>Matcher<a class="headerlink" href="#matcher" title="Permalink to this headline">¶</a></h2>
+<p><em>Matcher</em> objects match strings to patterns. Used by the <em>Walker</em> to filter file names
+and the <em>Finder</em> to filter text strings, the <em>Filter</em> allows you to specify match patterns by:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>match</dt>
+<dd>a list of exact match patterns</dd>
+<dt>prefix</dt>
+<dd>a list of prefix patterns</dd>
+<dt>suffix</dt>
+<dd>a list of suffix patterns</dd>
+<dt>substr</dt>
+<dd>a list of substring patterns</dd>
+<dt>regexp</dt>
+<dd>a list of regular expression patterns</dd>
+<dt>funcs</dt>
+<dd>a list of callback functions</dd>
+</dl>
+</div></blockquote>
+<p>Patterns are tested against strings in the order shown above.</p>
+<p>Some examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">f1</span> <span class="o">=</span> <span class="n">Matcher</span><span class="p">({</span> <span class="s">&quot;prefix&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">&quot;Kconfig&quot;</span><span class="p">,</span> <span class="s">&quot;Makefile&quot;</span><span class="p">]</span> <span class="p">})</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="n">Matcher</span><span class="p">({</span> <span class="s">&quot;suffix&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">&quot;.dts&quot;</span><span class="p">,</span><span class="s">&quot;.dtsi&quot;</span><span class="p">]</span> <span class="p">})</span>
+<span class="n">f3</span> <span class="o">=</span> <span class="n">Matcher</span><span class="p">({</span> <span class="s">&quot;substr&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">&quot;am33xx.dtsi&quot;</span><span class="p">,</span> <span class="s">&quot;am335x-bone.dts&quot;</span><span class="p">,</span> <span class="s">&quot;am335x-boneblack.dts&quot;</span><span class="p">,</span>
+      <span class="s">&quot;am335x-bone-common.dtsi&quot;</span><span class="p">,</span> <span class="s">&quot;am33xx_pwm-00A0.dts&quot;</span><span class="p">,</span> <span class="s">&quot;bone_pwm_P8_13-00A0.dts&quot;</span> <span class="p">]</span> <span class="p">})</span>
+<span class="n">f4</span> <span class="o">=</span> <span class="n">Matcher</span><span class="p">({</span> <span class="s">&quot;regexp&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">r&quot;.*am335x\-b.*\.dts.*&quot;</span><span class="p">,</span> <span class="s">r&quot;.*am33xx.*\.dts.*&quot;</span><span class="p">,</span> <span class="s">r&quot;.*bone.*\.dts.*&quot;</span><span class="p">]</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>Parameters like f1 can be used by the <em>Walker</em> to find all files whose names begin with &#8220;Kconfig&#8221; or &#8220;Makefile&#8221;
+in the folders you told it to search.</p>
+<p>Parameters like f2 can be used by the <em>Walker</em> to find all files whose names end with &#8221;.dts&#8221; or &#8221;.dtsi&#8221;.</p>
+<p>Parameters like f3 or f4 can be used by the <em>Finder</em> to find all references to the specified strings in your patch
+or source files.</p>
+<p>Using regular expressions may eliminate the need to use line continuations, but it can be difficult to formulate
+expressions that produce exactly the same result as simpler combinations of &#8216;substr&#8217;, etc.</p>
+<p>The &#8216;encoding&#8217; example shows how to use callback functions to select files for testing.</p>
+<p>See the &#8216;Matcher&#8217; section of the API documentation for call details.</p>
+</div>
+<div class="section" id="patch">
+<h2>Patch<a class="headerlink" href="#patch" title="Permalink to this headline">¶</a></h2>
+<p>Patch objects parse the strings of a patch file into an object suitable for analysis.
+The object will contain a list of Diff objects.</p>
+<p>Patch objects will discard any patch lines that have been commented out by surrounding them
+with lines containing only &#8216;&#8221;&#8220;&#8221;&#8217;. If you plan to use &#8216;git am&#8217; on a patch later, you should
+do the commenting in a copy of the patch.</p>
+<p>See the &#8216;Patch&#8217; section of the API documentation for call details.</p>
+<p>See checker.py for example usage of the Patch class.</p>
+</div>
+<div class="section" id="patchset">
+<h2>PatchSet<a class="headerlink" href="#patchset" title="Permalink to this headline">¶</a></h2>
+<p>Patch sets are normally organized in two level trees, with a root folder and sub directories
+for specific topics, e.g. &#8216;dma&#8217;. The &#8216;name&#8217; of a patch consists of its subdirectory name
+joined to its file name by  &#8216;/&#8217;.</p>
+<p>A patch set description is a dict that specifes the order in which the patches are to be applied.
+Its &#8216;groups&#8217; element is a list of the topic specific sub folders mentioned above. Within each
+sub folder, patches are intended to be applied in the order indicated by the first four characters
+of the patch file names. This order was encoded by using &#8216;git format-patch&#8217; or quilt to format
+the patches.</p>
+</div>
+<div class="section" id="strings">
+<h2>Strings<a class="headerlink" href="#strings" title="Permalink to this headline">¶</a></h2>
+<p>Strings objects provide useful string like methods for lists of strings.</p>
+<p>Note that taking a slice of a Strings object will always return a Strings object.</p>
+<p>Strings is used by the Watcher class, as well as by the Diff, Hunk and Patch classes.
+See those files and the examples files for more usage examples.</p>
+</div>
+<div class="section" id="viewer">
+<h2>Viewer<a class="headerlink" href="#viewer" title="Permalink to this headline">¶</a></h2>
+<p>Viewer objects allow you to view sets of related files, using graphical or nongraphical editors.</p>
+<p>The default editor on Linux is &#8216;gedit&#8217;, which allows numerous files to be displayed in a single window.</p>
+<p>The editor default can be overridden by passing an editor specification to the constructor,
+as shown in the API section below.</p>
+</div>
+<div class="section" id="walker">
+<h2>Walker<a class="headerlink" href="#walker" title="Permalink to this headline">¶</a></h2>
+<p>Walker objects walk a file tree and return the path of each discovered file.
+Directory and file filters may be applied to narrow the scope of a search in a large file tree.</p>
+</div>
+<div class="section" id="watcher">
+<h2>Watcher<a class="headerlink" href="#watcher" title="Permalink to this headline">¶</a></h2>
+<p>Watcher objects facilitate viewing diff sections in your patch files, diff sections in &#8220;patch archive&#8221;
+files, and the source files they reference. Patch archive files contain all the diff sections that
+were applied to the previous version of a kernel to obtain a new version.</p>
+<p>See the &#8216;archives&#8217; folder in the examples for typical usage.</p>
+</div>
+<div class="section" id="helper">
+<h2>Helper<a class="headerlink" href="#helper" title="Permalink to this headline">¶</a></h2>
+<p>Helper objects facilitate use of PatchTools&#8217;s tools, which have many required and
+optional parameters. The <em>Helper</em> provides wrapper functions for PatchTools classes,
+and some useful utility functions.</p>
+<div class="section" id="command-summary">
+<h3>Command Summary<a class="headerlink" href="#command-summary" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="utility-functions">
+<h4>Utility functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h4>
+<dl class="docutils">
+<dt>load</dt>
+<dd>load JSON data into a variable from a file</dd>
+<dt>save</dt>
+<dd>save a variable to a file as JSON string</dd>
+<dt>read</dt>
+<dd>read list of strings from a file into a variable</dd>
+<dt>write</dt>
+<dd>write a variable to a file as a list of strings</dd>
+</dl>
+</div>
+<div class="section" id="wrapper-functions">
+<h4>Wrapper functions<a class="headerlink" href="#wrapper-functions" title="Permalink to this headline">¶</a></h4>
+<dl class="docutils">
+<dt>cmd</dt>
+<dd>run <em>Command</em> to execute shell command synchronously</dd>
+<dt>find</dt>
+<dd>run <em>Finder</em> to find patterns in files</dd>
+<dt>check</dt>
+<dd>run <em>Checker</em> to check patch file(s) against source tree</dd>
+<dt>view</dt>
+<dd>display selected file[s]</dd>
+<dt>vp2f</dt>
+<dd>display patch and files it uses</dd>
+<dt>vf2p</dt>
+<dd>display file and patches that use it</dd>
+<dt>vp2p</dt>
+<dd>display patch and other patches that use the same files</dd>
+<dt>vp2a</dt>
+<dd>display patch and related patch archive diff sections</dd>
+<dt>vcpf</dt>
+<dd>display <em>Checker</em> output file, one patch file and the files referenced by the patch file</dd>
+<dt>walk</dt>
+<dd>run <em>Walker</em>  to generate a list of files for <em>Finder</em>, etc.</dd>
+<dt>watch</dt>
+<dd>run <em>Watcher</em> to detect integration of patches into released kernels</dd>
+</dl>
+<p>The <em>Helper</em> constructor creates a &#8216;defaults&#8217; item in the application&#8217;s config data object,
+using the values of &#8216;sourcedir&#8217;, &#8216;patchdir&#8217;, etc., found in the data, and subsequently
+uses it in calls to wrapper functions where the caller does not provide a parameters object.</p>
+<p>See the &#8216;Helper&#8217;  section of the API documentation for futher info.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>Many operations use configuration data that is loaded into a JSONConfig object during
+initialization. Items specified in the configuration data include the location of the
+source tree and of the patches directory. A description of the patch set may also be
+stored there.</p>
+<p>See the &#8216;config.json&#8217; file for an example, and the &#8216;JSONConfig&#8217; section of the
+API documentation.</p>
+</div>
+<div class="section" id="exceptions">
+<h1>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h1>
+<p>PatchTools objects are intended to be embedded in Python scripts, which can have various
+exception reporting and logging schemes. Consequently PatchTools classes generally do not
+catch exceptions except to translate them to other exceptions. For example, JSONConfig objects
+catch &#8216;KeyError&#8217; exceptions generated by Python&#8217;s json module, and map their line numbers to
+those used in the source file, which may have different line numbers due to comment lines.</p>
+<p>The exceptions.py file provides an ExceptionHandler class which can be used to print
+exception reports.</p>
+<p>PatchTools classes uniformly use exceptions to report errors, for example parameter errors,
+while return values are used to deliver valid result data to the caller. The exceptions are defined
+in exception.py.</p>
+<p>See the example files for a simple exception handling scheme.</p>
+</div>
+<div class="section" id="system-considerations">
+<h1>System Considerations<a class="headerlink" href="#system-considerations" title="Permalink to this headline">¶</a></h1>
+<p>All modules encode file paths in Unix style using &#8216;/&#8217; characters.</p>
+<p>The functions module determines if the Python version is 3.x when it is loaded.
+The Python version can then be obtained by other modules by calling the Functions.is_python3 method.</p>
+<p>If PatchTools is not installed in your Python installation, and you are not using Eclipse,
+you must specify the PYTHONPATH environment variable to allow Python to find the PatchTools modules.
+The easiest way to do this is to export the definition from your .profile file:</p>
+<div class="highlight-python"><div class="highlight"><pre>export PYTHONPATH=&quot;$HOME/Projects/Eclipse/Linux/PatchTools&quot;
+</pre></div>
+</div>
+<p>Then you can run test programs from any location.</p>
+<p>Eclipse-PyDev will define a PYTHONPATH variously according to the settings you choose when creating
+your project. The PYTHONPATH value should include the parent folder of the &#8216;patchtools&#8217; source
+folder, as in the setting above.</p>
+<p>Linux reportedly has adopted UTF-8 as the default text encoding, but some Linux kernel files contain
+&#8216;Latin_1&#8217; characters whose numeric values are greater than 127, and are not valid UTF-8 start bytes.
+Consequently the file access methods in the Functions class default to &#8216;Latin_1&#8217; encoding.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<p>This section shows typical usage of PatchTools classes and the <em>Helper</em> class.</p>
+<p>See the folders in the &#8216;examples&#8217; tree for the example code referenced below.</p>
+<div class="section" id="example-1-basic-features">
+<h2>Example 1 &#8211; Basic Features<a class="headerlink" href="#example-1-basic-features" title="Permalink to this headline">¶</a></h2>
+<p>This example shows the usage of many of the features described above.</p>
+<p>Suppose we want to create a source file list for the <em>Finder</em> that enumerates selected files
+in the kernel tree, but excludes the &#8216;.git&#8217; folder and any folders in &#8216;arch&#8217; other than
+&#8216;arch/arm&#8217;. This script will do the job:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">f</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;suffix&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">&quot;.c&quot;</span><span class="p">,</span><span class="s">&quot;h&quot;</span><span class="p">],</span> <span class="s">&quot;prefix&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;Makefile&quot;</span><span class="p">,</span><span class="s">&quot;Kconfig&quot;</span><span class="p">]</span> <span class="p">}</span>
+<span class="n">p</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;root_path&quot;</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;sourcedir&#39;</span><span class="p">],</span> <span class="s">&quot;incl_files&quot;</span> <span class="p">:</span> <span class="n">f</span> <span class="p">}</span>
+<span class="n">excl</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;excl_dirs&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">&quot;.git&quot;</span><span class="p">,</span><span class="s">&quot;arch&quot;</span><span class="p">]</span> <span class="p">}</span>
+<span class="n">incl</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;incl_dirs&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">&quot;arch/arm&quot;</span><span class="p">]</span> <span class="p">}</span>
+<span class="n">p1</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">incl</span><span class="p">)</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">excl</span><span class="p">)</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">+</span> <span class="n">walk</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;logdir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;/src_files.txt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Lines 1-4 create some dict variables to include in the parameters for the walk operations.</p>
+<p>Lines 5 and 6 combine these dicts to make the final parameter dicts.</p>
+<p>Line 7 executes the walk function on each parameter dict and combines their output.</p>
+<p>Line 8 writes the data to a file for future use.</p>
+<p>Running a script like this at the start of a project can substantially reduce the time required
+for subsequent <em>Finder</em> operations.</p>
+</div>
+<div class="section" id="example-2-viewer-1">
+<h2>Example 2 &#8211; Viewer 1<a class="headerlink" href="#example-2-viewer-1" title="Permalink to this headline">¶</a></h2>
+<p>In this example we want to assess the difficulty of porting some patch changes to our kernel by displaying
+a <em>Checker</em> output file, a kernel source file, and the patches that modify the source file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">h</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;logdir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;/match_a.log&quot;</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">vf2p</span><span class="p">(</span><span class="s">&quot;arch/arm/boot/dts/am33xx.dtsi&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the &#8216;gedit&#8217; editor is used (the Linux default editor), all the files will be displayed in a single window,
+in the following order for this example:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The source file</li>
+<li>The patch files in patchset group order, which is presumably their commit order.</li>
+</ul>
+</div></blockquote>
+<p>We observe that searching for &#8216;am33xx.dtsi&#8217; at the top of the <em>Checker</em> output file takes us to the report
+for patch &#8220;dma/0018...&#8221;, which is the first patch file displayed by gedit.</p>
+<p>The Viewer classes normally launch the editor in asynchronous (nowait) mode, which allows users to enter two commands
+like the ones above without being blocked at the first command.</p>
+</div>
+<div class="section" id="example-3-viewer-2">
+<h2>Example 3 &#8211; Viewer 2<a class="headerlink" href="#example-3-viewer-2" title="Permalink to this headline">¶</a></h2>
+<p>This example shows how the wait/nowait feature of the Viewer classes could be used to display a patch file,
+its corresponding <em>Checker</em> output file, and the files referenced by the patch, one at a time:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">p</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;patchdir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;/adc/0002-input-ti_am33x_tsc-Step-enable-bits-made-configurabl.patch&quot;</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="n">f</span> <span class="o">=</span> <span class="s">&quot;matcher.txt&quot;</span>
+<span class="n">h</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+<span class="n">v</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;wait&quot;</span> <span class="p">:</span> <span class="bp">True</span> <span class="p">}</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;sourcedir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;/drivers/iio/adc/ti_am335x_adc.c&quot;</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;sourcedir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;/drivers/input/touchscreen/ti_am335x_tsc.c&quot;</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;sourcedir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;/drivers/mfd/ti_am335x_tscadc.c&quot;</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;sourcedir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;/include/linux/mfd/ti_am335x_tscadc.h&quot;</span>
+<span class="n">h</span><span class="o">.</span><span class="n">view</span><span class="p">([</span><span class="n">p</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">a</span><span class="p">],</span><span class="n">v</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">view</span><span class="p">([</span><span class="n">p</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">b</span><span class="p">],</span><span class="n">v</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">view</span><span class="p">([</span><span class="n">p</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">c</span><span class="p">],</span><span class="n">v</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">view</span><span class="p">([</span><span class="n">p</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">d</span><span class="p">],</span><span class="n">v</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this scenario, each view command will block until its editor is closed.</p>
+</div>
+<div class="section" id="example-4-am33xx-drivers">
+<h2>Example 4 &#8211; AM33XX Drivers<a class="headerlink" href="#example-4-am33xx-drivers" title="Permalink to this headline">¶</a></h2>
+<p>In this example we will identify all the drivers used to control the Beagle&#8217;s AM335X processor by cross referencing
+&#8220;compatible =&#8221; items in the Beagle&#8217;s .dts files to &#8221;.compatible =&#8221; items in the &#8220;of_match&#8221; tables of the kernel source files.</p>
+<p>First we will find the dts compatible items:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">d</span> <span class="o">=</span> <span class="s">&quot;arch/arm/boot/dts/&quot;</span>
+<span class="n">l</span> <span class="o">=</span> <span class="p">[(</span><span class="n">d</span> <span class="o">+</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;am33xx.dtsi&quot;</span><span class="p">,</span><span class="s">&quot;am335x-bone-common.dtsi&quot;</span><span class="p">,</span> <span class="s">&quot;am335x-boneblack.dts&quot;</span><span class="p">,</span>
+     <span class="s">&quot;am33xx-clocks.dtsi&quot;</span><span class="p">,</span> <span class="s">&quot;tps65217.dtsi&quot;</span><span class="p">]]</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">find</span><span class="p">({</span> <span class="s">&quot;substr&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">&quot;compatible = &quot;</span><span class="p">]</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&quot;root_path&quot;</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;sourcedir&#39;</span><span class="p">],</span> <span class="s">&quot;file_paths&quot;</span> <span class="p">:</span> <span class="n">l</span> <span class="p">})</span>
+<span class="n">h</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;test3.txt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>test3.txt requires some post processing, as it contains extraneous text and duplicate entries.
+The <em>Helper&#8217;s</em> write method was used to save the list as &#8216;\n&#8217; terminated strings, so this task can be
+automated:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">strings</span> <span class="o">=</span> <span class="n">Strings</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&quot;test3.txt&quot;</span><span class="p">))</span>
+<span class="n">strings</span> <span class="o">=</span> <span class="n">strings</span><span class="o">.</span><span class="n">ltrim</span><span class="p">(</span><span class="s">&quot;compatible = &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rtrim</span><span class="p">(</span><span class="s">&#39;;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<span class="n">h</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="s">&quot;test4.txt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next we will list the kernel source files that might contain the corresponding entries in their of_match tables:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">p</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;root_path&quot;</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;sourcedir&#39;</span><span class="p">],</span> <span class="s">&quot;incl_files&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="s">&quot;suffix&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">&quot;.c&quot;</span><span class="p">]</span> <span class="p">}</span> <span class="p">}</span>
+<span class="n">p1</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">{</span> <span class="s">&quot;incl_dirs&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">&quot;arch/arm&quot;</span><span class="p">]</span> <span class="p">})</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">{</span> <span class="s">&quot;excl_dirs&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">&quot;arch&quot;</span><span class="p">,</span> <span class="s">&quot;.git&quot;</span><span class="p">,</span> <span class="s">&quot;Documentation&quot;</span><span class="p">,</span> <span class="s">&quot;staging&quot;</span><span class="p">,</span> <span class="s">&quot;samples&quot;</span><span class="p">,</span> <span class="s">&quot;tools&quot;</span> <span class="p">]</span> <span class="p">})</span>
+<span class="n">w1</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+<span class="n">w2</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">w1</span><span class="o">+</span><span class="n">w2</span><span class="p">,</span> <span class="s">&quot;test5.txt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this code the output was saved as a JSON object to allow using it as pattern parameters for the
+following find operation.</p>
+<p>Finally we will match the patterns in &#8220;test4.txt&#8221; to the source files:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">p</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&quot;test4.txt&quot;</span><span class="p">)</span> <span class="c"># read compatible = items</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;test5.txt&quot;</span><span class="p">)</span> <span class="c"># load candidate sources</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;sourcedir&#39;</span><span class="p">]</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">find</span><span class="p">({</span> <span class="s">&quot;substr&quot;</span> <span class="p">:</span> <span class="n">p</span> <span class="p">},{</span> <span class="s">&quot;root_path&quot;</span> <span class="p">:</span> <span class="n">r</span> <span class="p">,</span><span class="s">&quot;file_paths&quot;</span> <span class="p">:</span> <span class="n">f</span> <span class="p">})</span>
+<span class="n">h</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s">&quot;test6.txt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Again some editing of the output file &#8220;test6.txt&#8221; is needed to eliminate extraneous
+text and duplicates:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">strings</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&quot;test6.txt&quot;</span><span class="p">)</span>
+<span class="n">strings</span> <span class="o">=</span> <span class="p">[</span><span class="n">string</span><span class="p">[:</span><span class="n">string</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">)]</span> <span class="k">for</span> <span class="n">string</span> <span class="ow">in</span> <span class="n">strings</span><span class="p">]</span>
+<span class="n">strings</span> <span class="o">=</span> <span class="n">Strings</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<span class="n">h</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="s">&quot;am335x_drivers.lst&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The final list contains 36 am335x related drivers that are used to control the Beagle board.
+The list can be saved and passed to the <em>Checker</em> as a &#8216;targets&#8217; option, or to the <em>Watcher</em>
+to be run whenever a new kernel version is released by kernel.org.</p>
+</div>
+<div class="section" id="example-5-dts-study">
+<h2>Example 5 &#8211; DTS Study<a class="headerlink" href="#example-5-dts-study" title="Permalink to this headline">¶</a></h2>
+<p>The ARM community, including Texas Instruments and the Beagle developers, have been making substantial
+progress in the last year or two in adopting the &#8220;Device Tree&#8221; system for their products. It is possible that,
+although they have submitted many patches related to this effort, not all the patches have been integrated
+into our target kernel. In this example we will investigate the state of Beagle related .dts and .dtsi files
+in the patches and the kernel.</p>
+<p>Examination of the kernel&#8217;s &#8216;/arch/arm/boot/dts&#8217; folder shows that there are several files related to our
+target device, the BeagleBone Black:</p>
+<blockquote>
+<div><ul class="simple">
+<li>am335x-boneblack.dts</li>
+<li>am335x-bone-common.dtsi</li>
+<li>am33xx.dtsi</li>
+<li>am33xx-clocks.dtsi</li>
+<li>tps65217.dtsi</li>
+</ul>
+</div></blockquote>
+<p>We can find all the patches that touch these files with this <em>Helper</em> script:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">l</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">list_patches</span><span class="p">()</span>
+<span class="n">p</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;substr&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">&quot;am33xx.dtsi&quot;</span><span class="p">,</span> <span class="s">&quot;am335x-boneblack.dts&quot;</span><span class="p">,</span> <span class="s">&quot;am335x-bone-common.dtsi&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;tps65217.dtsi&quot;</span><span class="p">,</span> <span class="s">&quot;am33xx-clocks.dtsi&quot;</span><span class="p">]</span> <span class="p">}</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">{</span> <span class="s">&quot;root_path&quot;</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;patchdir&#39;</span><span class="p">],</span> <span class="s">&quot;file_paths&quot;</span> <span class="p">:</span> <span class="n">l</span><span class="p">,</span> <span class="s">&quot;format&quot;</span> <span class="p">:</span> <span class="s">&quot;files&quot;</span> <span class="p">})</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">PatchSet</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;defaults&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">sort_patches</span><span class="p">({</span> <span class="s">&quot;patches&quot;</span> <span class="p">:</span> <span class="n">f</span><span class="p">,</span> <span class="s">&quot;order&quot;</span> <span class="p">:</span> <span class="s">&quot;patchset&quot;</span> <span class="p">})</span>
+<span class="n">h</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;dts_patch_refs.lst&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first and sixth lines show use of the <em>Helper&#8217;s</em> utility functions, &#8216;list_patches&#8217; and &#8216;save&#8217;.</p>
+<p>The fourth line shows use of one of the <em>Helper&#8217;s</em> class wrapper functions, &#8216;find&#8217;. The &#8220;files&#8221;
+option tells the <em>Finder</em> to return only filenames, with no duplicates.</p>
+<p>See the API sections for descriptions of the functions, classes and parameters used.</p>
+<p>Now we have the file &#8220;dts_patch_refs.lst&#8221;, which contains the names of 76 patches that touch the files.
+From here we can use the <em>Helper</em>&#8216;s view commands to view the patches individually, and the files they use.
+For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">h</span><span class="o">.</span><span class="n">vp2f</span><span class="p">(</span><span class="s">&quot;pm/0062-ARM-OMAP2-AM33XX-timer-Interchance-clkevt-and-clksrc.patch&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The files can also be compared against a <em>Checker</em> output file by using the &#8216;vcpf&#8217; command:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">h</span><span class="o">.</span><span class="n">vcpf</span><span class="p">(</span><span class="s">&quot;check.log&quot;</span><span class="p">,</span> <span class="s">&quot;pm/0062-ARM-OMAP2-AM33XX-timer-Interchance-clkevt-and-clksrc.patch&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the default editor &#8216;gedit&#8217; is used, all the files for a single command will appear in one window.</p>
+<p>Inspecting the files in this way could take considerable time, but this process can be accelerated
+by using a <em>Helper</em> script like this:</p>
+<div class="highlight-python"><div class="highlight"><pre>fl = h.load(&quot;dts_patch_refs.lst&quot;)
+cp = h.extend(c[&#39;defaults&#39;], { &quot;mode&quot; : &quot;complete&quot;, &quot;find&quot; : True })
+ep = { &quot;wait&quot; : True }
+pd = c[&#39;patchdir&#39;] + &#39;/&#39;
+for patch in fl:
+    l = h.check(patch, cp)
+    h.write(l, test6.txt&quot;)
+    h.vcpf(&quot;test6.txt&quot;, pd + patch, c[&#39;defaults&#39;], ep)
+</pre></div>
+</div>
+<p>After checking the 76 patches we find that:</p>
+<blockquote>
+<div><ul class="simple">
+<li>27 of the patches specify changes that are already in the kernel, so the patches can be ignored.</li>
+<li>Another 28 of the patches relate to features we won&#8217;t use, i.e. certain capes, so these patches can also be ignored.</li>
+<li>One patch definitely needs to be fixed.</li>
+<li>21 patches need fixing if we will use their features, e.g. AM335 reset control or TI&#8217;s PM firmware.</li>
+<li>One patch has an undesirable modification of generic kernel files to work around a device specific problem,
+and should be redone.</li>
+</ul>
+</div></blockquote>
+<p>See the &#8216;report.txt&#8217; file in the examples/alldrivers folder for details.</p>
+<p>Similar investigations can be done for subsystems you may be interested in, e.g. dma, adc, gpio, etc.,
+with comparable results.</p>
+</div>
+<div class="section" id="example-6-tsc-adc-study">
+<h2>Example 6 &#8211; TSC/ADC Study<a class="headerlink" href="#example-6-tsc-adc-study" title="Permalink to this headline">¶</a></h2>
+<p>In this example we look into the appropriateness of patches that modify the touch screen control (TSC)
+and analog-digital converter (ADC) control logic in the kernel and driver files. We will use the <em>Helper</em>
+to facilitate the investigation.</p>
+<p>First we find patches that relate to terms such as &#8220;tscadc&#8221;,&#8221;tsc&#8221; and &#8220;adc&#8221;. But we use search terms
+such as &#8220;adc.c&#8221; to exclude extraneous matches to words containing those terms:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">l</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">list_patches</span><span class="p">()</span>
+<span class="n">p</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;substr&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s">&quot;tscadc.c&quot;</span><span class="p">,</span><span class="s">&quot;tscadc.h&quot;</span><span class="p">,</span><span class="s">&quot;tsc.c&quot;</span><span class="p">,</span><span class="s">&quot;tsc.h&quot;</span><span class="p">,</span><span class="s">&quot;adc.c&quot;</span><span class="p">,</span><span class="s">&quot;adc.h&quot;</span><span class="p">]</span> <span class="p">}</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">{</span> <span class="s">&quot;root_path&quot;</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;patchdir&#39;</span><span class="p">],</span> <span class="s">&quot;file_paths&quot;</span> <span class="p">:</span> <span class="n">l</span><span class="p">,</span> <span class="s">&quot;format&quot;</span> <span class="p">:</span> <span class="s">&quot;full&quot;</span> <span class="p">})</span>
+<span class="n">h</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;patch_refs.lst&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Inspection of &#8220;patch_refs.lst&#8221; shows these files are touched by the patches:</dt>
+<dd><ol class="first last arabic simple">
+<li>drivers/iio/adc/ti_am335x_adc.c</li>
+<li>drivers/input/touchscreen/ti_am335x_tsc.c</li>
+<li>drivers/mfd/ti_am335x_tscadc.c</li>
+<li>include/linux/mfd/ti_am335x_tscadc.h</li>
+<li>include/linux/input/ti_am335x_tsc.h</li>
+<li>include/linux/clk-provider.h</li>
+</ol>
+</dd>
+</dl>
+<p>Next we make a list of the  patches that touch each file, without duplicates:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">l</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">list_patches</span><span class="p">()</span>
+<span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;drivers/iio/adc/ti_am335x_adc.c&quot;</span><span class="p">,</span>
+     <span class="s">&quot;drivers/input/touchscreen/ti_am335x_tsc.c&quot;</span><span class="p">,</span>
+     <span class="s">&quot;drivers/mfd/ti_am335x_tscadc.c&quot;</span><span class="p">,</span>
+     <span class="s">&quot;include/linux/mfd/ti_am335x_tscadc.h&quot;</span>
+     <span class="s">&quot;include/linux/input/ti_am335x_tsc.h&quot;</span><span class="p">,</span>
+     <span class="s">&quot;include/linux/clk-provider.h&quot;</span><span class="p">]</span>
+<span class="n">p</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;root_path&quot;</span> <span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;patchdir&#39;</span><span class="p">],</span> <span class="s">&quot;file_paths&quot;</span> <span class="p">:</span> <span class="n">l</span><span class="p">,</span> <span class="s">&quot;format&quot;</span> <span class="p">:</span> <span class="s">&quot;files&quot;</span> <span class="p">}</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">find</span><span class="p">({</span> <span class="s">&quot;substr&quot;</span> <span class="p">:</span> <span class="n">t</span> <span class="p">},</span> <span class="n">p</span><span class="p">)</span>
+<span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[:</span><span class="n">s</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">)]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">f</span><span class="p">]</span> <span class="c"># Extract patch name</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">Strings</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<span class="n">h</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;patch_refs2.lst&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The &#8220;patch_refs2.lst&#8221; file now contains the names of 23 patches that touch the files. We can use
+the <em>Checker</em> and <em>Viewer</em> to examine the patches and files:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">f</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;patch_refs2.lst&quot;</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;defaults&#39;</span><span class="p">],</span> <span class="p">{</span> <span class="s">&quot;mode&quot;</span> <span class="p">:</span> <span class="s">&quot;complete&quot;</span><span class="p">,</span> <span class="s">&quot;find&quot;</span> <span class="p">:</span> <span class="bp">True</span> <span class="p">})</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;patchdir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span>
+<span class="n">cf</span> <span class="o">=</span> <span class="s">&quot;../test/test6.txt&quot;</span>
+<span class="k">for</span> <span class="n">patch</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">patch</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    <span class="n">h</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">cf</span><span class="p">)</span>
+    <span class="n">h</span><span class="o">.</span><span class="n">vcpf</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">r</span> <span class="o">+</span> <span class="n">patch</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="p">{</span> <span class="s">&quot;wait&quot;</span> <span class="p">:</span> <span class="bp">True</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>The results have been summarized in the file &#8220;report.txt&#8221; in the examples/tsc_adc folder. See the Notes
+section at the bottom of that file for an explanation of the codes used.</p>
+<p>We see that although the majority of diff and hunk sections are marked &#8220;N/N&#8221; (not needed), a significant
+minority are indicated to need fixing. Some of these only need to have their line numbers adjusted to fit
+the target code, but others have more serious problems. In particular, certain features such as enhancing
+interrupt logic and adding work queues have not been integrated into the target kernel drivers. In other cases,
+the changes requested by some patches may have been obsoleted by other patches that were integrated into
+the kernel.</p>
+<p>The situation is more complicated than was the case in the DTS study, and more investigation is needed.
+However we can drop further consideration of all the patch sections marked &#8220;N/N&#8221; or &#8220;N/U&#8221;, and focus on the
+remaining sections. The best approach may be to use the existing versions of the target files,
+and only fix and apply the patch sections that affect our project.</p>
+</div>
+<div class="section" id="example-7-cape-manager-study">
+<h2>Example 7 &#8211; Cape Manager Study<a class="headerlink" href="#example-7-cape-manager-study" title="Permalink to this headline">¶</a></h2>
+<p>The BeagleBone board developers have devised a sytem to allow accessory boards that to be plugged into
+a Beagle board using its GPIO connectors, and have supported the development of a kernel mode file
+&#8216;capemgr.c&#8217; to provide some control of such boards. The patches that created and enhanced the file have
+not been integrated into the target kernel, so the file is not found there. In this example, we
+investigate the use of &#8216;git am&#8217; command and the patch utility to recreate the file from the patches.</p>
+<p>See the examples/capemgr folder for the code, and Appendix D - Checker vs. quilt vs &#8216;git am&#8217;
+for a discussion of the results. The generated file is found under the examples/capemgr/quilt folder.</p>
+</div>
+</div>
+<div class="section" id="classes-api">
+<h1>Classes API<a class="headerlink" href="#classes-api" title="Permalink to this headline">¶</a></h1>
+<p>Complete documentation of the API&#8217;s of the <em>Helper</em> and PatchTools classes is provided below.</p>
+<div class="section" id="id1">
+<h2>Archive<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>Extract information from &#8220;patch archive&#8221; files</p>
+<div class="section" id="archive-path">
+<h3>Archive(path)<a class="headerlink" href="#archive-path" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">path (string): path to patch archive file</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError, PT_NotFoundError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">A &#8220;patch archive&#8221; file lists diff sections from patches that were applied to</div>
+<div class="line">produce the associated kernel version. Since the patch archive files can be very large,</div>
+<div class="line">we take care to avoid copying or storing data that is not of interest to the user.</div>
+</div>
+</div>
+</div>
+<div class="section" id="sections-filenames">
+<h3>sections(filenames)<a class="headerlink" href="#sections-filenames" title="Permalink to this headline">¶</a></h3>
+<p>Find archive file sections that modify files also modified by our patches</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">filenames (list): file names referenced in our patches</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">A list of sections. Each section is a list of strings, in which</div>
+<div class="line">the first string identifies the start line number of a diff section,</div>
+<div class="line">and the remaining strings are the content of the diff section.</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">None</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>Checker<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>Validate the contents of Linux kernel patch files against
+the files specified in them</p>
+<div class="section" id="checker-params">
+<h3>Checker(params)<a class="headerlink" href="#checker-params" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">params (dict): parameters</div>
+<div class="line-block">
+<div class="line">sourcedir  (string,required):       path to source directory</div>
+<div class="line">patchdir   (string,required):       path to patch directory</div>
+<div class="line">targets    (string/list, optional): target file(s)</div>
+<div class="line">indent     (int, optional):         indentation</div>
+<div class="line-block">
+<div class="line">default = 3</div>
+</div>
+<div class="line">mode (string, optional): scanning mode</div>
+<div class="line-block">
+<div class="line">&#8216;full&#8217;     : report edit errors only</div>
+<div class="line">&#8216;complete&#8217; : report status of all edits</div>
+<div class="line">default is &#8216;full&#8217;</div>
+</div>
+<div class="line">find (bool, optional): find missing strings</div>
+<div class="line-block">
+<div class="line">default is True</div>
+</div>
+<div class="line">debug (int, optional) debug options</div>
+<div class="line-block">
+<div class="line">default is 0</div>
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">If &#8216;&#8217; is passed as sourcedir or patchdir, the caller must supply file</div>
+<div class="line">paths to the match method that are accessible from the caller&#8217;s current dircectory.</div>
+<div class="line"><br /></div>
+<div class="line">If &#8216;targets&#8217; is specified the code will only scan diff sections that</div>
+<div class="line">modify the filenames in params[&#8216;targets]</div>
+</div>
+</div>
+</div>
+<div class="section" id="match-param">
+<h3>match(param)<a class="headerlink" href="#match-param" title="Permalink to this headline">¶</a></h3>
+<p>Validate the contents of one or more Linux kernel patch files against a kernel</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">param (choice):</div>
+<div class="line-block">
+<div class="line">(string): path to patch file</div>
+<div class="line">(list): paths to patch files</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">A list of strings describing the results of analysis</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError</div>
+<div class="line">PT_ParsingError</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>Finder<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>Find references to patterns you specify in a Linux kernel tree,
+a patch archive file, or in a set of patches</p>
+<div class="section" id="finder-params">
+<h3>Finder(params)<a class="headerlink" href="#finder-params" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">params (dict): parameters</div>
+<div class="line-block">
+<div class="line">root_path   (string, required): path of file tree root</div>
+<div class="line">file_paths  (list, required):   relative paths of files to search</div>
+<div class="line">options (string, optional): display format</div>
+<div class="line-block">
+<div class="line">&#8216;terse&#8217;    show count of matching lines</div>
+<div class="line">&#8216;compact&#8217;  show line numbers of matching lines</div>
+<div class="line">&#8216;full&#8217;     show line number and text of matching lines</div>
+<div class="line">&#8216;complete&#8217; also show matching pattern</div>
+<div class="line">&#8216;match&#8217;    list only matching text</div>
+<div class="line-block">
+<div class="line">default is &#8216;full&#8217;</div>
+</div>
+</div>
+<div class="line">mode (string, optional) search mode</div>
+<div class="line-block">
+<div class="line">&#8216;file&#8217; report results by file</div>
+<div class="line">&#8216;pattern&#8217; report results by pattern</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">trim_paths (bool, optional): remove root portion of paths from returned paths</div>
+<div class="line-block">
+<div class="line">default is True</div>
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError</div>
+<div class="line">PT_NotFoundError</div>
+</div>
+</div>
+</div>
+<div class="section" id="match-params">
+<h3>match(params)<a class="headerlink" href="#match-params" title="Permalink to this headline">¶</a></h3>
+<p>Report matches by file to (patterns) found in selected files</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">filter (dict): Filter parameters</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">A list of matches in the format specified above</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">See the Filter object for a description of Filter parameters.</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>Viewer<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>Display a set of files in a user selected editor</p>
+<div class="section" id="viewer-params-none">
+<h3>Viewer(params=None)<a class="headerlink" href="#viewer-params-none" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">params (dict, optional): parameters</div>
+<div class="line-block">
+<div class="line">editor (dict, optional): editor specification</div>
+<div class="line-block">
+<div class="line">target    (string, required): name or path for target program</div>
+<div class="line">multifile (bool, required):   can open multiple files in a single invocation</div>
+<div class="line">multiview (bool, required):   can display multiple files in a single window</div>
+</div>
+<div class="line">root (string, optional): a path to prefix to all filenames</div>
+<div class="line">wait (bool, optional):   wait for subprocess to exit</div>
+<div class="line-block">
+<div class="line">default is False</div>
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">If editor is not specified, the default editor for the host system is used.</div>
+<div class="line">The default editor for Linux is gedit. The default editor for Windows is write</div>
+<div class="line">(aka &#8216;WordPad&#8217;).</div>
+<div class="line">If any method is called in a loop, the wait option should be True.</div>
+</div>
+</div>
+</div>
+<div class="section" id="view-files">
+<h3>view(files)<a class="headerlink" href="#view-files" title="Permalink to this headline">¶</a></h3>
+<p>Launch specified editor to view the file(s)</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">files (list): paths of files to display</div>
+<div class="line">check_files(bool): verify target files exist</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError for any missing files</div>
+</div>
+</div>
+</div>
+<div class="section" id="vp2f-patchname-params">
+<h3>vp2f(patchname, params)<a class="headerlink" href="#vp2f-patchname-params" title="Permalink to this headline">¶</a></h3>
+<p>List patch and files it uses</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patchname (string): name of patch file</div>
+<div class="line">params    (dict):   parameters</div>
+<div class="line-block">
+<div class="line">patchdir  (string, required): path of patches folder</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError for any missing files</div>
+</div>
+</div>
+</div>
+<div class="section" id="vp2p-patchname-params">
+<h3>vp2p(patchname, params)<a class="headerlink" href="#vp2p-patchname-params" title="Permalink to this headline">¶</a></h3>
+<p>Display a patch file and the other patch files that use the same source files</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patchname (string): name of patch file</div>
+<div class="line">params    (dict):   parameters</div>
+<div class="line-block">
+<div class="line">patchdir  (string, required): path of patches folder</div>
+<div class="line">patchset  (dict, required):   patchset description</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError for any missing files</div>
+</div>
+</div>
+</div>
+<div class="section" id="vp2a-patchname-archpath-params">
+<h3>vp2a(patchname, archpath, params)<a class="headerlink" href="#vp2a-patchname-archpath-params" title="Permalink to this headline">¶</a></h3>
+<p>Display patch and archive diff sections that use its files</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patchname (string): name of patch file</div>
+<div class="line">archpath  (string): path to archive file</div>
+<div class="line">params    (dict):   parameters</div>
+<div class="line-block">
+<div class="line">patchdir (string, required): path of patches folder</div>
+<div class="line">tempdir  (string, required): path to store temporary data</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError for any missing files</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">Launches the editor synchronously, since a temporary file is created to hold</div>
+<div class="line">the archive sections.</div>
+</div>
+</div>
+</div>
+<div class="section" id="vcpf-checkpath-patchname-params">
+<h3>vcpf(checkpath, patchname, params)<a class="headerlink" href="#vcpf-checkpath-patchname-params" title="Permalink to this headline">¶</a></h3>
+<p>List checker output file, patch and files it uses</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">checkpath (string): path to Checker output file</div>
+<div class="line">patchname (string): patch name</div>
+<div class="line">params (dict) parameters:</div>
+<div class="line-block">
+<div class="line">sourcedir (string, required): path of sources folder</div>
+<div class="line">patchdir  (string, required): path of patches folder</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError</div>
+<div class="line">PT_NotFoundError</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>Walker<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<p>Enumerate paths of selected files in a source tree</p>
+<div class="section" id="walker-params">
+<h3>Walker(params)<a class="headerlink" href="#walker-params" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">params (dict, required)  parameters:</div>
+<div class="line-block">
+<div class="line">root_path  (string, required): search root path</div>
+<div class="line">incl_dirs  (list, optional):   top level subdirs to include</div>
+<div class="line">excl_dirs  (list, optional):   top level subdirs to exclude</div>
+<div class="line">incl_files (dict, optional):   include file name filters</div>
+<div class="line">excl_files (dict, optional):   exclude file name filters</div>
+<div class="line">test_dirs  (bool, optional):   True = include dir in tests</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">The &#8220;root_path&#8221; parameter specifies the root of the search.</div>
+<div class="line">If the &#8220;incl_dirs&#8221; option is specified, only those subdirs of the root will be searched.</div>
+<div class="line">If the &#8220;excl_dirs&#8221; option is specified, those subdirs of the root will not be searched.</div>
+<div class="line">If the &#8220;incl_files&#8221; option is specified, only those filetypes will be enumerated.</div>
+<div class="line">If the &#8220;excl_files&#8221; option is specified, those filetypes will not be enumerated.</div>
+<div class="line">If it is desired to search a folder that is a subfolder of an excluded folder,</div>
+<div class="line">the search must be split into two operations.</div>
+<div class="line">When callback functions need the containing directory to test a file name,</div>
+<div class="line">the &#8216;test_dirs&#8217; option should be set to True</div>
+<div class="line"><br /></div>
+<div class="line">Walking a large file tree can take significant time and produce a large amount of data,</div>
+<div class="line">but this tendency can be reduced by cleaning the tree of generated files beforehand,</div>
+<div class="line">and by applying suitable directory and file filters.</div>
+</div>
+</div>
+</div>
+<div class="section" id="walk">
+<h3>walk()<a class="headerlink" href="#walk" title="Permalink to this headline">¶</a></h3>
+<p>The walk starts here</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">None</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">A list of matching file paths</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">None</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id6">
+<h2>Watcher<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p>Determine if your patches have been integrated into released kernel versions</p>
+<div class="section" id="watcher-params">
+<h3>Watcher(params)<a class="headerlink" href="#watcher-params" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">params (dict): parameters</div>
+<div class="line-block">
+<div class="line">patchdir  (string, required): path to patch folder</div>
+<div class="line">sourcedir (string, required): path to source folder</div>
+<div class="line">datadir   (string, required): path to data folder</div>
+<div class="line">tempdir   (string, required): path to temp file folder</div>
+<div class="line">patchset  (dict, required):   description of patches</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError</div>
+<div class="line">PT_NotFoundError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">Experience in testing shows a very low probability that an archive</div>
+<div class="line">diff section will match any of our patches exactly, so we merely</div>
+<div class="line">display the related files.</div>
+</div>
+</div>
+</div>
+<div class="section" id="watch-archpath">
+<h3>watch(archpath)<a class="headerlink" href="#watch-archpath" title="Permalink to this headline">¶</a></h3>
+<p>View files related to archive diff sections</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">archpath (string): path to patch archive file</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">None. Output is a series of launches of the Viewer to view the files.</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError</div>
+<div class="line">PT_NotFoundError</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="diff">
+<h2>Diff<a class="headerlink" href="#diff" title="Permalink to this headline">¶</a></h2>
+<p>Extract information from a diff section of a patch file</p>
+<div class="section" id="diff-strings">
+<h3>Diff(strings)<a class="headerlink" href="#diff-strings" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">strings (Strings): diff section from a patch file or archive file</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="hunk">
+<h2>Hunk<a class="headerlink" href="#hunk" title="Permalink to this headline">¶</a></h2>
+<p>Extract information from a hunk section of a patch file</p>
+<div class="section" id="hunk-strings">
+<h3>Hunk(strings)<a class="headerlink" href="#hunk-strings" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">strings (Strings): hunk section from a patch file or archive file</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id7">
+<h2>JSONConfig<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<p>Store configuration data obtained from enhanced JSON input files</p>
+<div class="section" id="jsonconfig-params-none">
+<h3>JSONConfig(params=None)<a class="headerlink" href="#jsonconfig-params-none" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">params (dict, optional): parameters</div>
+<div class="line-block">
+<div class="line">filepath  (string, required): path to file with enhanced JSON encoded string, or None</div>
+<div class="line">separator (string, optional): char to use as separator in path expressions</div>
+<div class="line-block">
+<div class="line">default is &#8216;/&#8217;</div>
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">JSONConfigParameterError</div>
+</div>
+</div>
+</div>
+<div class="section" id="getitem-key">
+<h3>__getitem__(key)<a class="headerlink" href="#getitem-key" title="Permalink to this headline">¶</a></h3>
+<p>Ensure that a slice of our data is returned as a str object,
+when the value is a unicode string, on Python2.x</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">k (str/unicode):   item index</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">str(value) when Python is 2.x and value is unicode</div>
+<div class="line">otherwise, value</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">JSONConfigTypeError, JSONConfigKeyError</div>
+</div>
+</div>
+</div>
+<div class="section" id="get-key">
+<h3>get(key)<a class="headerlink" href="#get-key" title="Permalink to this headline">¶</a></h3>
+<p>Get top level value or internal value</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">key (string): path to internal value</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">The value addressed by key</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">JSONConfigTypeError, JSONConfigKeyError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">The key argument may be the name of a top level key in the data, or a &#8220;path expression&#8221;.</div>
+<div class="line">Such an expression contains one or more instances of &#8216;/&#8217; or of a user defined separator,</div>
+<div class="line">and encodes a path to a node in the dict.</div>
+<div class="line">For example, self.get(&#8220;/mysql_options/admin_profile/data_base&#8221;) will get the value at</div>
+<div class="line-block">
+<div class="line">self[&#8220;mysql_options&#8221;][&#8220;admin_profile&#8221;][&#8220;data_base&#8221;]</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Values may also be accessed by normal Python indexing of the dict superclass.</div>
+</div>
+</div>
+</div>
+<div class="section" id="set-key-value">
+<h3>set(key, value)<a class="headerlink" href="#set-key-value" title="Permalink to this headline">¶</a></h3>
+<p>Set top level value or internal value</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">key   (string): path to internal value</div>
+<div class="line">value (any Python value)</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">None</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">JSONConfigTypeError, JSONConfigKeyError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">See notes for get method.</div>
+</div>
+</div>
+</div>
+<div class="section" id="add-data">
+<h3>add(data)<a class="headerlink" href="#add-data" title="Permalink to this headline">¶</a></h3>
+<p>Add data to the current config</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">data (choice):</div>
+<div class="line-block">
+<div class="line">A string path to a file to load</div>
+<div class="line">A string representation of a JSON object</div>
+<div class="line">A Python dict</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">None</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">OSError or IOError when a file has problems</div>
+<div class="line">JSONConfigTypeError, etc, when JSON string is incorrectly formatted</div>
+</div>
+</div>
+</div>
+<div class="section" id="has-key">
+<h3>has(key)<a class="headerlink" href="#has-key" title="Permalink to this headline">¶</a></h3>
+<p>Determine if item is in the config data</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">key (string): path to internal value</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">True if item was found, else False</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id8">
+<h2>Patch<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<p>Extract information from a patch file</p>
+<div class="section" id="patch-path">
+<h3>Patch(path)<a class="headerlink" href="#patch-path" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">path (string): path to patch file</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError</div>
+<div class="line">PT_NotFoundError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">Commented out diff and hunk sections are omitted.</div>
+</div>
+</div>
+</div>
+<div class="section" id="list-files-patchpath-staticmethod">
+<h3>list_files(patchpath) &lt;staticmethod&gt;<a class="headerlink" href="#list-files-patchpath-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>List the files referenced by a patch, without duplicates</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patchpath (string) path to patch file</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">list of filenames</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">A &#8220;filename&#8221; is the portion of the file&#8217;s path after the kernel root,</div>
+<div class="line">e.g. &#8220;drivers/iio/...&#8221;.</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id9">
+<h2>PatchSet<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<p>Extract information from a set of patch files</p>
+<div class="section" id="patchset-params">
+<h3>PatchSet(params)<a class="headerlink" href="#patchset-params" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">params (dict):  parameters</div>
+<div class="line-block">
+<div class="line">patchdir  (string, required): path to patch directory</div>
+<div class="line">patchset  (dict, required):   description of patches in patchdir</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError</div>
+</div>
+</div>
+</div>
+<div class="section" id="get-file-data">
+<h3>get_file_data()<a class="headerlink" href="#get-file-data" title="Permalink to this headline">¶</a></h3>
+<p>Get source file data for patches</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">None</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">A mapping of patch names to file names.</div>
+</div>
+</div>
+</div>
+<div class="section" id="get-patch-data">
+<h3>get_patch_data()<a class="headerlink" href="#get-patch-data" title="Permalink to this headline">¶</a></h3>
+<p>Get patch data for source files</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">None</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">A mapping of file names to patch names.</div>
+</div>
+</div>
+</div>
+<div class="section" id="get-patch-names-params-none">
+<h3>get_patch_names(params=None)<a class="headerlink" href="#get-patch-names-params-none" title="Permalink to this headline">¶</a></h3>
+<p>Return list of names of patches in our patch set</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">params (dict, optional): parameters</div>
+<div class="line-block">
+<div class="line">excl_dirs (list, optional): directories to exclude</div>
+<div class="line">incl_dirs (list, optional): directories to include</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">list of patch names in the order found in patchset</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">The &#8220;name&#8221; of a patch is the concatenation of the name of its parent folder</div>
+<div class="line">and its filename, as shown in the patchset description.</div>
+<div class="line"><br /></div>
+<div class="line">If params is None, names of all patches are returned.</div>
+</div>
+</div>
+</div>
+<div class="section" id="get-patch-files-patchname">
+<h3>get_patch_files(patchname)<a class="headerlink" href="#get-patch-files-patchname" title="Permalink to this headline">¶</a></h3>
+<p>Return a list of source files referenced in one patch file</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patchname (string): name of patch file</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError, PT_NotFoundError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">This function may be used to generate file lists for the <em>Finder</em>.</div>
+</div>
+</div>
+</div>
+<div class="section" id="get-file-patches-filename">
+<h3>get_file_patches(filename)<a class="headerlink" href="#get-file-patches-filename" title="Permalink to this headline">¶</a></h3>
+<p>Return a list of patch files that refer to one source file</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">filename (string): name of source file</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError, PT_NotFoundError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">This function may be used to generate file lists for the <em>Matcher</em>.</div>
+</div>
+</div>
+</div>
+<div class="section" id="get-patch-patches-patchname">
+<h3>get_patch_patches(patchname)<a class="headerlink" href="#get-patch-patches-patchname" title="Permalink to this headline">¶</a></h3>
+<p>Get a list of patches that patchname depends on</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patchname (string): name of patch file</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">A list of names of the parent patches in patchset order</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError, PT_NotFoundError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">Patch A depends on patch B when they modify the same files</div>
+<div class="line">and patch B precedes patch A in the patch list.</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="ptobject">
+<h2>PTObject<a class="headerlink" href="#ptobject" title="Permalink to this headline">¶</a></h2>
+<p>PatchTools super class</p>
+<p>Provides an identifiable super class for all PatchTools classes.
+Implements common parameter checking functions for the sub classes.</p>
+</div>
+<div class="section" id="id10">
+<h2>Strings<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
+<p>Provide some useful string like methods for lists of strings</p>
+<div class="section" id="strings-data-none">
+<h3>Strings(data=None)<a class="headerlink" href="#strings-data-none" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">data (list, optional): a list of strings</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">StringsParameterError</div>
+</div>
+</div>
+</div>
+<div class="section" id="getitem-i">
+<h3>__getitem__(i)<a class="headerlink" href="#getitem-i" title="Permalink to this headline">¶</a></h3>
+<p>Ensure that slices of Strings objects are returned as Strings objects, not lists</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">i (int):   item index</div>
+<div class="line">i (tuple): (start, stop, [step])</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">Strings(self[i:j])</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">For mysterious reasons, slice keys can be passed as tuples, not slice objects.</div>
+<div class="line">In such cases, we convert the tuples to slices.</div>
+</div>
+</div>
+</div>
+<div class="section" id="find-pattern-begin-none-end-none">
+<h3>find(pattern, begin=None, end=None)<a class="headerlink" href="#find-pattern-begin-none-end-none" title="Permalink to this headline">¶</a></h3>
+<p>Find the first string in our data that starts with (pattern)</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">pattern (str):  the substring to match</div>
+<div class="line">begin   (int):  start index</div>
+<div class="line">end     (int):  stop index</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">Found: the index of matching string</div>
+<div class="line">Not found: -1</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">StringsParameterError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">If begin is not specified, it is set to 0</div>
+<div class="line">If end is not specified, it is set to len(self).</div>
+<div class="line">All strings are left stripped before testing.</div>
+</div>
+</div>
+</div>
+<div class="section" id="match-patterns-begin-none-end-none">
+<h3>match(patterns, begin=None, end=None)<a class="headerlink" href="#match-patterns-begin-none-end-none" title="Permalink to this headline">¶</a></h3>
+<p>Find the first string in our data that starts with a pattern in (patterns)</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patterns (list): The substring to match</div>
+<div class="line">begin    (int):  Start index</div>
+<div class="line">end      (int):  Stop index</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">Found: the index of matching string, and the matching pattern</div>
+<div class="line">Not found: -1, &#8216;&#8217;</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">StringsParameterError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">If begin is not specified, it is set to 0</div>
+<div class="line">If end is not specified, it is set to len(self).</div>
+<div class="line">All strings are left stripped before testing.</div>
+</div>
+</div>
+</div>
+<div class="section" id="rfind-pattern-begin-none-end-none">
+<h3>rfind(pattern, begin=None, end=None)<a class="headerlink" href="#rfind-pattern-begin-none-end-none" title="Permalink to this headline">¶</a></h3>
+<p>Find the last string in our data that starts with (pattern)</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">pattern (str):  the substring to match</div>
+<div class="line">begin   (int):  start index</div>
+<div class="line">end     (int):  stop index</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">Found: the index of matching string</div>
+<div class="line">Not found: -1</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">StringsParameterError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">If end is not specified, it is set to -1.</div>
+<div class="line">len(self) is added to the value of begin.</div>
+<div class="line">All strings are left stripped before testing.</div>
+</div>
+</div>
+</div>
+<div class="section" id="rmatch-patterns-begin-none-end-none">
+<h3>rmatch(patterns, begin=None, end=None)<a class="headerlink" href="#rmatch-patterns-begin-none-end-none" title="Permalink to this headline">¶</a></h3>
+<p>Find the last string in our data that starts with a string in (patterns)</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patterns (str): The substrings to match</div>
+<div class="line">begin    (int):  Start index</div>
+<div class="line">end      (int):  Stop index</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">Found: the index of matching string, and the matching pattern</div>
+<div class="line">Not found: -1, &#8216;&#8217;</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">StringsParameterError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">If end is not specified, it is set to -1.</div>
+<div class="line">len(self) is added to the value of begin.</div>
+<div class="line">All strings are left stripped before testing.</div>
+</div>
+</div>
+</div>
+<div class="section" id="filter-pattern-begin-none-end-none">
+<h3>filter(pattern, begin=None, end=None)<a class="headerlink" href="#filter-pattern-begin-none-end-none" title="Permalink to this headline">¶</a></h3>
+<p>Find all strings in our data that start with (pattern)</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">pattern (str):  the substring to match</div>
+<div class="line">begin   (int):  start index</div>
+<div class="line">end     (int):  stop index</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">Found: A list of the indices of the matching strings</div>
+<div class="line">Not found: None</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">StringsParameterError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">If begin is not specified, it is set to 0</div>
+<div class="line">If end is not specified, it is set to len(self).</div>
+<div class="line">All strings are left stripped before testing.</div>
+</div>
+</div>
+</div>
+<div class="section" id="index-pattern">
+<h3>index(pattern)<a class="headerlink" href="#index-pattern" title="Permalink to this headline">¶</a></h3>
+<p>Return indices of strings that exactly match (pattern)</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">pattern (string): search text</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">StringsParameterError</div>
+</div>
+</div>
+</div>
+<div class="section" id="lstrip">
+<h3>lstrip()<a class="headerlink" href="#lstrip" title="Permalink to this headline">¶</a></h3>
+<p>Remove leading lines that are empty or whitespace</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">none</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">self, to allow chaining to slices, other methods</div>
+</div>
+</div>
+</div>
+<div class="section" id="rstrip">
+<h3>rstrip()<a class="headerlink" href="#rstrip" title="Permalink to this headline">¶</a></h3>
+<p>Remove trailing lines that are empty or whitespace.</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">none</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">self, to allow chaining to slices, other methods</div>
+</div>
+</div>
+</div>
+<div class="section" id="partition-splitter">
+<h3>partition(splitter)<a class="headerlink" href="#partition-splitter" title="Permalink to this headline">¶</a></h3>
+<p>Split our data into two parts at a splitter pattern, searching forwards</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">splitter (str): The substring that splits the parts</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">splitter was found:</div>
+<div class="line-block">
+<div class="line">A tuple (head, tail) where head is a Strings object containing the first part,</div>
+<div class="line">and tail is a Strings object containing the second part.</div>
+</div>
+<div class="line">splitter was not found:</div>
+<div class="line-block">
+<div class="line">(self, None)</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">Example: (head, body) = patch.partition(&#8216;diff &#8211;git &#8216;)</div>
+</div>
+</div>
+</div>
+<div class="section" id="rpartition-splitter">
+<h3>rpartition(splitter)<a class="headerlink" href="#rpartition-splitter" title="Permalink to this headline">¶</a></h3>
+<p>Split our data into two parts at a splitter pattern, searching backwards</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">splitter (str): The substring that splits the parts</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">splitter was found:</div>
+<div class="line-block">
+<div class="line">A tuple (body, tail) where body is a Strings object containing the first part,</div>
+<div class="line">and tail is a Strings object containing the second part</div>
+</div>
+<div class="line">splitter was not found:</div>
+<div class="line-block">
+<div class="line">(None, self)</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">Example: (body, tail) = patch.rpartition(&#8216;&#8211; &#8216;)</div>
+</div>
+</div>
+</div>
+<div class="section" id="split-splitter">
+<h3>split(splitter)<a class="headerlink" href="#split-splitter" title="Permalink to this headline">¶</a></h3>
+<p>Split our data into two or more parts at occurrences of a splitter pattern</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">splitter (str): The substring that splits the parts</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">A list of Strings objects, each of which contains a part</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">StringsParameterError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">Example: diffs = body.split(&#8216;diff &#8211;git &#8216;)</div>
+<div class="line">This code will split the Strings object &#8216;body&#8217; into a list of sections,</div>
+<div class="line">each of which starts with a string beginning with (&#8216;diff &#8211;git &#8216;).</div>
+</div>
+</div>
+</div>
+<div class="section" id="extract-begin-end">
+<h3>extract(begin, end)<a class="headerlink" href="#extract-begin-end" title="Permalink to this headline">¶</a></h3>
+<p>Extract a list of sections tagged by (begin) and (end)</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">begin (str): section start marker</div>
+<div class="line">end   (str): section end marker</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">A list of Strings objects, one for each extracted section</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">The begin and end markers are not returned in the output</div>
+<div class="line"><br /></div>
+<div class="line">Example: sections = strlist.extract(&#8216;#++&#8217;, &#8216;#&#8211;&#8217;)</div>
+<div class="line">This code will extract all strings between &#8216;#++&#8217; and &#8216;#&#8211;&#8217; in strings.py</div>
+<div class="line">(this file) if the file has been read into strlist.</div>
+</div>
+</div>
+</div>
+<div class="section" id="discard-begin-end">
+<h3>discard(begin, end)<a class="headerlink" href="#discard-begin-end" title="Permalink to this headline">¶</a></h3>
+<p>Remove a list of sections tagged by (begin) and (end)</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">begin (str): section start marker</div>
+<div class="line">end   (str): section end marker</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">A Strings object.</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">The begin and end markers are not returned in the output</div>
+</div>
+</div>
+</div>
+<div class="section" id="sort">
+<h3>sort()<a class="headerlink" href="#sort" title="Permalink to this headline">¶</a></h3>
+<p>Sort our data.</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">none</div>
+</div>
+</div>
+</div>
+<div class="section" id="unique">
+<h3>unique()<a class="headerlink" href="#unique" title="Permalink to this headline">¶</a></h3>
+<p>Remove duplicate successive instances of strings in  our data.</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">none</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">To remove all duplicates, sort the data first</div>
+</div>
+</div>
+</div>
+<div class="section" id="join-lists-staticmethod">
+<h3>join(lists) &lt;staticmethod&gt;<a class="headerlink" href="#join-lists-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Join a list of objects into a single Strings object.
+Each object is a list of strings or a Strings object.</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">lists (list): list of list or Strings objects</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">A Strings object containing all strings in the lists</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">StringsParameterError</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">Example:</div>
+<div class="line-block">
+<div class="line">list1 = Strings([&#8216;a&#8217;,&#8217;b&#8217;])</div>
+<div class="line">list2 = [&#8216;c&#8217;,&#8217;d&#8217;]</div>
+<div class="line">list3 = Strings.join([list, list2])</div>
+</div>
+<div class="line">This code will join the contents of list1 and list2 in list3.</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id11">
+<h2>Command<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<p>Execute command in subprocess</p>
+<div class="section" id="id12">
+<h3>Command()<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">None</div>
+</div>
+</div>
+</div>
+<div class="section" id="sync-cmd">
+<h3>sync(cmd)<a class="headerlink" href="#sync-cmd" title="Permalink to this headline">¶</a></h3>
+<p>Execute subprocess synchronously</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">cmd (string): shell command to execute</div>
+<div class="line">cmd (list):   command arguments to pass</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">A list of strings:</div>
+<div class="line-block">
+<div class="line">[&#8216;retcode&#8217; : 0,</div>
+<div class="line-block">
+<div class="line">&#8216;output&#8217; : &#8216;...&#8217;,</div>
+<div class="line">&#8216;errors&#8217; : &#8216;...&#8217;</div>
+<div class="line">]</div>
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">CommandParameterError when command is not a string type</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">Shell command  is a string like &#8220;cd tmp &amp;&amp; ls&#8221;.</div>
+<div class="line">Command arguments is a list like [&#8216;gedit&#8217;, &#8216;file1&#8217;, file2&#8217;,...]</div>
+<div class="line">Output and errors strings are only returned to the caller</div>
+<div class="line">when the subprocess returns output or errors.</div>
+</div>
+</div>
+</div>
+<div class="section" id="async-cmd">
+<h3>async(cmd)<a class="headerlink" href="#async-cmd" title="Permalink to this headline">¶</a></h3>
+<p>Execute subprocess asynchronously</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">cmd (string): shell command to execute</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">None</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">see sync method above.</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">see sync method above.</div>
+</div>
+</div>
+</div>
+<div class="section" id="wait">
+<h3>wait()<a class="headerlink" href="#wait" title="Permalink to this headline">¶</a></h3>
+<p>Wait for asynchronous subprocess to exit</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">None</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">list of result strings</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">CommandStateError when no subprocess is active</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="exceptionhandler">
+<h2>ExceptionHandler<a class="headerlink" href="#exceptionhandler" title="Permalink to this headline">¶</a></h2>
+<p>Handle exceptions</p>
+<div class="section" id="exceptionhandler-params-none">
+<h3>ExceptionHandler(params=None)<a class="headerlink" href="#exceptionhandler-params-none" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">params (dict): parameters</div>
+<div class="line-block">
+<div class="line">trace (bool, optional): format exception traceback</div>
+<div class="line-block">
+<div class="line">default is True</div>
+</div>
+<div class="line">print (bool): print results</div>
+<div class="line-block">
+<div class="line">default is True</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id13">
+<h2>Helper<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
+<p>Facilitate use of PatchTools&#8217;s classes</p>
+<div class="section" id="helper-configpath">
+<h3>Helper(configpath)<a class="headerlink" href="#helper-configpath" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">config (dict): configuration data</div>
+</div>
+</div>
+</div>
+<div class="section" id="cmd-command">
+<h3>cmd(command)<a class="headerlink" href="#cmd-command" title="Permalink to this headline">¶</a></h3>
+<p>Handle Command request</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">command (string) shell command to execute</div>
+</div>
+</div>
+</div>
+<div class="section" id="find-patterns-params">
+<h3>find(patterns, params)<a class="headerlink" href="#find-patterns-params" title="Permalink to this headline">¶</a></h3>
+<p>Handle Finder request</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patterns (dict) Matcher parameters</div>
+<div class="line">params   (dict) Finder parameters</div>
+</div>
+</div>
+</div>
+<div class="section" id="check-patches-params-none">
+<h3>check(patches, params=None)<a class="headerlink" href="#check-patches-params-none" title="Permalink to this headline">¶</a></h3>
+<p>Handle Checker request</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patches (string/list, required) patch file(s)</div>
+<div class="line">params  (dict, optional) Checker parameters</div>
+</div>
+</div>
+</div>
+<div class="section" id="walk-params">
+<h3>walk(params)<a class="headerlink" href="#walk-params" title="Permalink to this headline">¶</a></h3>
+<p>Handle Walker request</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">params (dict, required) Walker parameters</div>
+</div>
+</div>
+</div>
+<div class="section" id="watch-archives-params-none">
+<h3>watch(archives, params=None)<a class="headerlink" href="#watch-archives-params-none" title="Permalink to this headline">¶</a></h3>
+<p>Handle Watcher request</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">archives (string/list)    archive file path(s)</div>
+<div class="line">params   (dict, optional) Watcher parameters</div>
+</div>
+</div>
+</div>
+<div class="section" id="view-files-params-none">
+<h3>view(files, params=None)<a class="headerlink" href="#view-files-params-none" title="Permalink to this headline">¶</a></h3>
+<p>View specified file(s)</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">files  (string/list) file path(s)</div>
+<div class="line">params (dict, optional) Viewer parameters</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">If params is not specified, the default file viewer is used.</div>
+</div>
+</div>
+</div>
+<div class="section" id="vp2f-patchname-params-none">
+<h3>vp2f(patchname, params=None)<a class="headerlink" href="#vp2f-patchname-params-none" title="Permalink to this headline">¶</a></h3>
+<p>View patch and the source files it references</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patchname (string) patch file name</div>
+<div class="line">params    (dict, optional) Viewer parameters</div>
+</div>
+</div>
+</div>
+<div class="section" id="vf2p-filepath-params-none">
+<h3>vf2p(filepath, params=None)<a class="headerlink" href="#vf2p-filepath-params-none" title="Permalink to this headline">¶</a></h3>
+<p>View source file and the patches that reference it</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">filepath (string) file path</div>
+<div class="line">params   (dict, optional) Viewer parameters</div>
+</div>
+</div>
+</div>
+<div class="section" id="vp2p-patchname-params-none">
+<h3>vp2p(patchname, params=None)<a class="headerlink" href="#vp2p-patchname-params-none" title="Permalink to this headline">¶</a></h3>
+<p>View patch and other patches that reference its files</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patchname   (string) patch name</div>
+<div class="line">params      (dict, optional) Viewer parameters</div>
+</div>
+</div>
+</div>
+<div class="section" id="vp2a-patchname-archivepath-params-none">
+<h3>vp2a(patchname, archivepath, params=None)<a class="headerlink" href="#vp2a-patchname-archivepath-params-none" title="Permalink to this headline">¶</a></h3>
+<p>View patch and archive diff sections that reference its files:</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">patchname   (string) patch name</div>
+<div class="line">archivepath (string) archive file path</div>
+<div class="line">params      (dict, optional) Viewer parameters</div>
+</div>
+</div>
+</div>
+<div class="section" id="vcpf-checkpath-patchname-context-none-params-none">
+<h3>vcpf(checkpath, patchname, context=None, params=None)<a class="headerlink" href="#vcpf-checkpath-patchname-context-none-params-none" title="Permalink to this headline">¶</a></h3>
+<p>View Checker output, patch file and the source files it references,
+one at a time.</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">checkpath (string) checker output file path</div>
+<div class="line">patchname (string) patch name</div>
+<div class="line">context   (dict)   source, dir, patchdir, etc.</div>
+<div class="line">params    (dict, optional) Viewer parameters</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">If context is not passed, config[&#8216;defaults&#8217;] is used.</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id14">
+<h2>Matcher<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h2>
+<p>Implement filter selection of strings</p>
+<div class="section" id="matcher-params">
+<h3>Matcher(params)<a class="headerlink" href="#matcher-params" title="Permalink to this headline">¶</a></h3>
+<p>Constructor</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">params (dict): parameters</div>
+<div class="line-block">
+<div class="line">match    (list, optional): string match pattern(s)</div>
+<div class="line">prefix   (list, optional): string start pattern(s)</div>
+<div class="line">suffix   (list, optional): string end pattern(s)</div>
+<div class="line">substr   (list, optional): substring pattern(s)</div>
+<div class="line">regexp   (list, optional): regular expression pattern(s)</div>
+<div class="line">funcs    (list, optional): callback function(s)</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="line">Raises:</div>
+<div class="line-block">
+<div class="line">PT_ParameterError on invalid parameters</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">At least one option must be specified for the filter to have an effect.</div>
+<div class="line">Regular expression pattern strings should be coded using the r&#8221;...&#8221; string form.</div>
+</div>
+</div>
+</div>
+<div class="section" id="call-string">
+<h3>__call__(string)<a class="headerlink" href="#call-string" title="Permalink to this headline">¶</a></h3>
+<p>Try to match string to stored filter</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">string (string): string to match</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">text of the matching pattern, or None</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<p>Utility functions</p>
+<p>Linux source files and patches that describe them may contain byte values
+that are legal &#8216;Latin-1&#8217; (aka ISO-8859-1) character codes, but not legal
+&#8216;UTF-8&#8217; start bytes. For example, 0xb3 is the &#8216;Latin-1&#8217; character for the
+cube symbol, i.e. a superscript 3. For this reason the file access functions
+below default to the &#8216;latin_1&#8217; encoding.</p>
+<div class="section" id="is-windows-staticmethod">
+<h3>is_windows() &lt;staticmethod&gt;<a class="headerlink" href="#is-windows-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Report whether the host system is Windows</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">None</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">True if running on Windows, else False</div>
+</div>
+</div>
+</div>
+<div class="section" id="is-python3-staticmethod">
+<h3>is_python3() &lt;staticmethod&gt;<a class="headerlink" href="#is-python3-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Report whether the Python version is &gt;= 3</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">None</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">True if running on Python 3, else False</div>
+</div>
+</div>
+</div>
+<div class="section" id="file-size-path-staticmethod">
+<h3>file_size(path) &lt;staticmethod&gt;<a class="headerlink" href="#file-size-path-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Determine size of the file/folder at (path)</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">path (string): file path</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">size (int): file size in bytes</div>
+</div>
+</div>
+</div>
+<div class="section" id="is-dir-path-staticmethod">
+<h3>is_dir(path) &lt;staticmethod&gt;<a class="headerlink" href="#is-dir-path-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Determine whether the object at (path) is a directory</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">path (string): file path</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">True if the path exists and is a directory.</div>
+</div>
+</div>
+</div>
+<div class="section" id="is-file-path-staticmethod">
+<h3>is_file(path) &lt;staticmethod&gt;<a class="headerlink" href="#is-file-path-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Determine whether the object at (path) is a file</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">path (string): file path</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">True if the path exists and is a regular file.</div>
+</div>
+</div>
+</div>
+<div class="section" id="join-path-head-tail-staticmethod">
+<h3>join_path(head, tail) &lt;staticmethod&gt;<a class="headerlink" href="#join-path-head-tail-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Form a path from (head) and (tail).</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">head (string): path prefix</div>
+<div class="line">tail (string): path suffix</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">string: the resulting path</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">This function allows head and tail to contain embedded &#8216;/&#8217; characters.</div>
+</div>
+</div>
+</div>
+<div class="section" id="trim-path-head-path-staticmethod">
+<h3>trim_path(head, path) &lt;staticmethod&gt;<a class="headerlink" href="#trim-path-head-path-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>remove (head) from (path.</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">head (string): path prefix</div>
+<div class="line">path (string): path</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">string: the resulting path</div>
+</div>
+</div>
+</div>
+<div class="section" id="read-file-path-enc-latin-1-staticmethod">
+<h3>read_file(path, enc=&#8217;latin_1&#8217;) &lt;staticmethod&gt;<a class="headerlink" href="#read-file-path-enc-latin-1-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Read file data.</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">path (string): file path</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">File data as a single object.</div>
+</div>
+</div>
+</div>
+<div class="section" id="read-lines-path-enc-latin-1-staticmethod">
+<h3>read_lines(path, enc=&#8217;latin_1&#8217;) &lt;staticmethod&gt;<a class="headerlink" href="#read-lines-path-enc-latin-1-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Read file lines.</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">path (string): file path</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">File data as a list of &#8216;n&#8217; terminated strings.</div>
+</div>
+</div>
+</div>
+<div class="section" id="read-strings-path-enc-latin-1-staticmethod">
+<h3>read_strings(path, enc=&#8217;latin_1&#8217;) &lt;staticmethod&gt;<a class="headerlink" href="#read-strings-path-enc-latin-1-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Read file strings.</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">path (string): file path</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">File data as a list of strings.</div>
+</div>
+</div>
+</div>
+<div class="section" id="write-file-text-path-enc-latin-1-staticmethod">
+<h3>write_file(text, path, enc=&#8217;latin_1&#8217;) &lt;staticmethod&gt;<a class="headerlink" href="#write-file-text-path-enc-latin-1-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Write text to file at path</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">path (string): file path</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">None</div>
+</div>
+</div>
+</div>
+<div class="section" id="write-strings-strings-path-enc-latin-1-staticmethod">
+<h3>write_strings(strings, path, enc=&#8217;latin_1&#8217;) &lt;staticmethod&gt;<a class="headerlink" href="#write-strings-strings-path-enc-latin-1-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Write strings to file at(path)</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">path (string): file path</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">None</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">If (strings) intentionally has empty strings, using str.join() would</div>
+<div class="line">delete them, which may cause problems for readers of the file.</div>
+<div class="line">Here we write the strings one at a time.</div>
+</div>
+</div>
+</div>
+<div class="section" id="get-string-filename-string-staticmethod">
+<h3>get_string_filename(string) &lt;staticmethod&gt;<a class="headerlink" href="#get-string-filename-string-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Extract filename from string</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">string (string): input string</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">filename (string): filename substring</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">Supported string formats:</div>
+<div class="line-block">
+<div class="line">In patches:</div>
+<div class="line-block">
+<div class="line">&#8216;diff &#8211;git a/foo... b/foo...&#8217;</div>
+<div class="line">&#8216;diff -u -R -n foo... foo...&#8217;</div>
+<div class="line">&#8216;&#8212; foo...&#8217;</div>
+<div class="line">&#8216;+++ foo...</div>
+</div>
+<div class="line">In a Checker output file:</div>
+<div class="line-block">
+<div class="line">&#8216;DIFF: diff &#8211;git a/arch/powerpc/mm/numa.c b/arch/powerpc/mm/numa.c&#8217;</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="normalize-string-string-strip-true-staticmethod">
+<h3>normalize_string(string, strip=True) &lt;staticmethod&gt;<a class="headerlink" href="#normalize-string-string-strip-true-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Replace all internal string whitespace by single spaces</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">string (string): input string</div>
+<div class="line">strip  (bool):   True = strip the string first</div>
+</div>
+</div>
+</div>
+<div class="section" id="string-to-words-string-staticmethod">
+<h3>string_to_words(string) &lt;staticmethod&gt;<a class="headerlink" href="#string-to-words-string-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Split a string into words on space boundaries.</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">string (string): input string</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">After splitting, words are stripped of whitespace and empty words</div>
+<div class="line">are removed.</div>
+</div>
+</div>
+</div>
+<div class="section" id="is-string-type-param-staticmethod">
+<h3>is_string_type(param) &lt;staticmethod&gt;<a class="headerlink" href="#is-string-type-param-staticmethod" title="Permalink to this headline">¶</a></h3>
+<p>Determine if an object is a string</p>
+<div class="line-block">
+<div class="line">Args:</div>
+<div class="line-block">
+<div class="line">param (unknown): input object</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Returns:</div>
+<div class="line-block">
+<div class="line">True if the object is a string, else False</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Notes:</div>
+<div class="line-block">
+<div class="line">Python2 has str, unicode and StringTypes, while Python3</div>
+<div class="line">has only str.</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="appendix-a-patch-basics">
+<h1>Appendix A &#8211; Patch Basics<a class="headerlink" href="#appendix-a-patch-basics" title="Permalink to this headline">¶</a></h1>
+<p>For a number of years, the Linux kernel source has been managed by the GIT source
+code control system. Normally you will use GIT commands to obtain and update kernels.
+GIT uses patches to modify the kernel sources. Linux kernel patches are usually produced
+by running the &#8216;git format-patch&#8217; command, which commits your changes if needed,
+and also generates the patches.</p>
+<p>A typical patch file is &#8220;0002-ARM-OMAP-Hack-AM33xx-clock-data-to-allow-JTAG-use.patch&#8221;:</p>
+<div class="highlight-python"><div class="highlight"><pre>From ac9bb90cbb8c81dd384e339063e72d2fc90221c2 Mon Sep 17 00:00:00 2001
+From: Matt Porter &lt;mporter@ti.com&gt;
+Date: Mon, 7 Jan 2013 11:55:00 -0500
+Subject: [PATCH 02/35] ARM: OMAP: Hack AM33xx clock data to allow JTAG use
+
+The debugss interface clock must remain enabled at init
+in order to prevent an attached JTAG probe from hanging.
+
+Signed-off-by: Matt Porter &lt;mporter@ti.com&gt;
+---
+arch/arm/mach-omap2/cclock33xx_data.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/mach-omap2/cclock33xx_data.c b/arch/arm/mach-omap2/cclock33xx_data.c
+index ea64ad6..a09d6d7 100644
+--- a/arch/arm/mach-omap2/cclock33xx_data.c
++++ b/arch/arm/mach-omap2/cclock33xx_data.c
+@@ -428,7 +428,7 @@ DEFINE_STRUCT_CLK(smartreflex1_fck, dpll_core_ck_parents, clk_ops_null);
+ *     - usbotg_fck (its additional clock and not really a modulemode)
+ *     - ieee5000
+ */
+-DEFINE_CLK_GATE(debugss_ick, &quot;dpll_core_m4_ck&quot;, &amp;dpll_core_m4_ck, 0x0,
++DEFINE_CLK_GATE(debugss_ick, &quot;dpll_core_m4_ck&quot;, &amp;dpll_core_m4_ck, ENABLE_ON_INIT,
+                                 AM33XX_CM_WKUP_DEBUGSS_CLKCTRL, AM33XX_MODULEMODE_SWCTRL_SHIFT,
+                                 0x0, NULL);
+
+--
+1.7.10.4
+</pre></div>
+</div>
+<p>This format is a variation on the &#8216;diff -urN&#8217; format that is sometimes described in the literature,
+and is still used in application packages. The patch content in this format is the body of an email
+message. The patch may have one or more &#8216;diff&#8217; sections that refer to the same or different
+files, and each diff section may have one or more &#8216;hunk&#8217; sections (marked by lines starting with &#8216;&#64;&#64;&#8217;).</p>
+<p>See &lt;<a class="reference external" href="http://wikipedia.org/wiki/Diff">http://wikipedia.org/wiki/Diff</a>&gt; for basic information on diff formats.</p>
+<p>Note that:</p>
+<ul class="simple">
+<li>The &#8216;a&#8217; at the start of a path denotes the original/old version of the kernel tree.</li>
+<li>The &#8216;b&#8217; at the start of a path denotes the patched/new version of the kernel tree.</li>
+<li>Paths in the diff line are nominal paths.</li>
+<li>The index line identifies the commit state before and after applying the patch (see below).</li>
+<li>A &#8216;&#8212;&#8217; line contains the actual path of an &#8220;a&#8221; file, or &#8216;/dev/null&#8217;.</li>
+<li>A &#8216;+++&#8217; line contains the actual path of a &#8220;b&#8221; file, or &#8216;/dev/null&#8217;.</li>
+<li>The &#8216;&#64;&#64;&#8217; lines indicate &#8216;hunks&#8217; (ranges over which following edit lines are to be applied).</li>
+<li>The -m,n values indicate the start line number and length of the hunk information in the &#8220;a&#8221; (old) file.</li>
+<li>The +m,n values indicate the start line number and length of the hunk information in the &#8220;b&#8221; (new) file.</li>
+<li>Line numbers are 1-based.</li>
+<li>An edit line starting with &#8216;+&#8217; indicates an addition to the old version to obtain the new version.</li>
+<li>An edit line starting with &#8216;-&#8216; indicates a deletion from the old version to obtain the new version.</li>
+<li>An edit line that starts with &#8216; &#8216; is in both files, but possibly at different line numbers.
+Such lines are called &#8216;merge&#8217; lines in the <em>Checker</em> output.</li>
+<li>Lines that appear to be blank in a hunk are part of the hunk data.</li>
+<li>A &#8216;delete&#8217; line followed by an &#8216;add&#8217; line constitutes a &#8216;change&#8217; request.</li>
+</ul>
+<p>In hunk lines (that begin with &#8216;&#64;&#64;&#8217;) the text after the second &#8216;&#64;&#64;&#8217; is termed a &#8216;hunk note&#8217; in the
+PatchTools source code. Hunk notes appear to be copies of the closest previous source line that
+has a character in the first column, e.g. function declaration lines and label lines in a .c file.
+Hunk notes are useful in finding text that is not in the location expected by a patch, but may not
+be unique if the file uses conditional compilation (e.g. &#8220;#ifdef FOO&#8221;).</p>
+<p>The index line contains values obtained from the SHA1 checksums computed on the commit states before
+and after applying the patch on the patch developer&#8217;s system. When possible, a short unique prefix
+of a checksum is used.</p>
+<p>Some special cases are handled differently by GIT than by &#8216;diff -urN&#8217;:</p>
+<p>Addition of a new file to the tree:</p>
+<div class="highlight-python"><div class="highlight"><pre>diff --git ...
+new file mode 100644
+index ea64ad6..a09d6d7 100644
+--- /dev/null
++++ b/arch/arm/mach-omap2/cclock33xx_data.c
+@@ -0,0 +1,n @@ ...
+...
+</pre></div>
+</div>
+<p>where n is the number of lines in the new file.</p>
+<p>Removal of an old file from the tree:</p>
+<div class="highlight-python"><div class="highlight"><pre>diff --git ...
+deleted file mode 100644
+index ea64ad6..a09d6d7 100644
+--- a/arch/arm/mach-omap2/cclock33xx_data.c
++++ /dev/null
+@@ -1,n  +0,0 @@ ...
+...
+</pre></div>
+</div>
+<p>where n is the number of lines in the old file.</p>
+<p>Addition of a binary file to the tree:</p>
+<div class="highlight-python"><div class="highlight"><pre>diff --git ...
+new file mode 100755
+index &lt;old git index&gt; .. &lt;new git index&gt;
+GIT binary patch
+literal 11764
+zcmds7eQ;dWb-! ...
+</pre></div>
+</div>
+<p>The <em>Checker</em> does not handle binary patches.</p>
+</div>
+<div class="section" id="appendix-b-patch-archives">
+<h1>Appendix B &#8211; Patch Archives<a class="headerlink" href="#appendix-b-patch-archives" title="Permalink to this headline">¶</a></h1>
+<p>Each kernel released by kernel.org has an associated &#8220;patch&#8221; file shown on the site&#8217;s
+main page, which you can download. The file is an &#8216;xz&#8217; archive that contains a single
+text file which is the concatenation of the diff sections from all the patches that
+were applied to produce the kernel version. Note that the file does not contain patch
+file names, since the patches were submitted to kernel.org as email messages. The archive
+also does not contain other information from the patch headers such as &#8216;Author&#8217;, &#8216;Date&#8217;, etc.</p>
+<p>Some data values in the diffs may be different than the corresponding values in the submitted patch files.
+A patch is submitted by an author as an email message. If the patch is accepted for inclusion into the kernel,
+the author will later receive some message like &#8220;please rebase your patch to the tip of branch x&#8221;. Rebasing may
+involve changing the hunk line numbers and possibly the text of edits. The kernel developer/maintainer will
+apply the changed patch. Consequently the index checksums will be different than those in the patch,
+and the hunk line numbers and edits may also differ.</p>
+</div>
+<div class="section" id="appendix-c-examples">
+<h1>Appendix C - Examples<a class="headerlink" href="#appendix-c-examples" title="Permalink to this headline">¶</a></h1>
+<p>Examples are found in the examples folder, and are coded using the <em>Helper</em> class for convenience.</p>
+<p>PatchTools was developed using a fairly large set of patches assembled by eLinux.org
+to create an embedded Ubuntu version based on Linux kernel version 3.8.13
+that could be used with the well known &#8220;BeagleBone&#8221; embedded computers, which use ARM based
+processors provided by Texas Instruments. Contact eLinux.org to get the patches.</p>
+<p>We have used various other kernels for testing; most recently a stable kernel with
+version number 3.16.1 was used.</p>
+<p>The source files &#8216;config.json&#8217; shows how to set up configuration data for the <em>Helper</em>,
+which uses a JSONConfig object to store and access the data.</p>
+<p>After studying the <em>Helper</em> documentation, you can embark on experiments related to your project.</p>
+</div>
+<div class="section" id="appendix-d-software-design">
+<h1>Appendix D - Software Design<a class="headerlink" href="#appendix-d-software-design" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="program-structure">
+<h2>Program structure<a class="headerlink" href="#program-structure" title="Permalink to this headline">¶</a></h2>
+<p>PatchTools is implemented with Python new style classes, for consistency of style, and to allow
+integration of its components into other scripts or processes.</p>
+<p>Class constructors process parameters that are expected not to change between invocations,
+while instance methods process parameters that are different in each invocation.
+For example:</p>
+<div class="highlight-python"><div class="highlight"><pre>c = Checker({ &#39;patchdir&#39; : &lt;path to patch dir&gt;, &#39;sourcedir&#39; : &lt;path to kernel dir&gt; })
+r = c.check(&lt;patchname1&gt;)
+s = c.check(&lt;patchname2&gt;)
+</pre></div>
+</div>
+<p>Class constructors have a single dict argument to receive parameters.</p>
+<p>Instance methods usually have one or two target file parameters, and may have a dict argument to receive context data.</p>
+<p>Since parameter values are provided by end users, extensive validation is performed on the values.</p>
+<p>The <em>Helper</em> class provides convenient wrappers for the classes and useful utility functions.
+It can be used as shown in the examples.</p>
+</div>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>The software has been implemented using the Kepler version of Eclipse with the PyDev plugin on a Linux Mint16
+system. Use of these tools for further development is not required, but if they are not used, some additional
+setup may be needed.</p>
+<p>All import statements use this form:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">patchtools.lib.utils.functions</span> <span class="kn">import</span> <span class="n">Functions</span> <span class="k">as</span> <span class="n">ut</span>
+</pre></div>
+</div>
+<p>This verbose form will prevent components in other packages from being found in the Python path
+when the intention is to import a PatchTools component. On launching a program the Python interpreter
+builds a sys.path variable including some standard locations and the value of the environment
+variable PYTHONPATH if it is defined.</p>
+<p>If PatchTools is not installed in your Python system, Python will only be able to find it if PYTHONPATH is set
+correctly. To match the absolute paths as shown above, PYTHONPATH should point to the directory that includes
+the patchtools, not to the patchtools directory itself.</p>
+<p>Eclipse-PyDev may not configure PYTHONPATH correctly if you are not careful, and also adds a large set of folders
+to the Python path. You can edit the Eclipse PYTHONPATH variable on the project&#8217;s properties page.</p>
+<p>PYTHONPATH won&#8217;t normally be defined in your environment when, for example, you try to launch an application
+in a shell. On Linux, you can overcome this problem by exporting a value from your .profile file or by wrapping
+calls to the application file in a script (call it &#8216;do_run&#8217;):</p>
+<div class="highlight-python"><div class="highlight"><pre>PYTHONPATH=`pwd` ; $@
+</pre></div>
+</div>
+<p>which may be used like so:</p>
+<div class="highlight-python"><div class="highlight"><pre>./do_run test_app.py
+</pre></div>
+</div>
+<p>The do_run script should be located in the parent directory of patchtools to get a correct value for PYTHONPATH.</p>
+</div>
+</div>
+<div class="section" id="appendix-d-checker-vs-quilt-vs-git-am">
+<h1>Appendix D - Checker vs. quilt vs &#8216;git am&#8217;<a class="headerlink" href="#appendix-d-checker-vs-quilt-vs-git-am" title="Permalink to this headline">¶</a></h1>
+<p>The <em>Checker</em> analyzes patches and source code, and reports problems to the user. It does not try to fix a patch
+or make it fit the source.</p>
+<p>Quilt and &#8216;git am&#8217; will detect the same sort of problems as the the <em>Checker</em> does in their analysis of patches
+and sources. Quilt and &#8216;git am&#8217; will try to resolve some of these problems by shifting patch lines elsewhere in
+the source file, sometimes by a large distance. But they will reject patches that cannot be fixed in this simple
+way.</p>
+<p>Quilt will notify you that it has shifted lines to make a hunk fit the source, but &#8216;git am&#8217; does not.</p>
+<p>Inspection of typical <em>Checker</em> output gathered on the &#8216;patches-3.8&#8217; patch set shows a sizable number of
+different patterns of mismatch between patches and source files. Many of these patterns will be too complex
+for quilt or &#8216;git am&#8217; to fix. But the <em>Checker</em> can show you in great detail what is wrong with the patches,
+and can allow you to develop a strategy to fix them.</p>
+<p>It is also possible that the simplistic fixing strategies pursued by quilt and &#8216;git am&#8217; may not produce a
+correct result, or may hide from you that there is a problem in the code. In the &#8216;capemgr&#8217; tests in the
+&#8216;examples&#8217; folder, it was observed that quilt shifted the last few hunks in the last patch by about 71 lines,
+and that &#8216;git am&#8217; probably did also, but did not report doing so. Both programs claimed to have applied the
+patches successfully.</p>
+<p>From the <em>Checker</em> output it appears that the next to last version of capemgr.c (produced by the &#8216;resources/0023...&#8217;
+patch) had about 70 lines of extra text that was not expected to be present by the last patch. And examining the
+last two patches shows they both have the same &#8216;before&#8217; checksum value in their index lines, which is incorrect.
+You may wish to investigate why this is so.</p>
+<p>The <em>Checker</em> does not create any work files in the source tree, modify either the source or the patch files,
+require you to use a specific folder structure, or require you to have GIT metadata in the source tree.</p>
+<p>Quilt requires you to create a tree of work files including the patches and kernel directory, and also requires
+you to reset the source files targeted by the patches to their original versions each time you run it to test
+a set of patches. It also requires you to reset the &#8216;applied-patches&#8217; file to the empty state.</p>
+<p>&#8216;git am&#8217;, of course, can only be used in a &#8220;working directory&#8221;, i.e. a source tree that has been obtained
+from a GIT repo, and has GIT metadata.</p>
+</div>
+<div class="section" id="appendix-e-checker-output">
+<h1>Appendix E - Checker Output<a class="headerlink" href="#appendix-e-checker-output" title="Permalink to this headline">¶</a></h1>
+<p>The <em>Checker</em> emits various kinds of error messages:</p>
+<ul class="simple">
+<li>&#8220;a&#8221; files missing from the target source tree.</li>
+<li>&#8220;b&#8221; files incorrectly present in the target tree.</li>
+<li>Format errors in the patch file.</li>
+<li>Incorrect start or count values in the hunk specification lines.</li>
+<li>Lines that are supposed to be in &#8220;a&#8221; source files, but are not at the specified locations.</li>
+<li>Lines that are supposed to be absent from &#8220;a&#8221; source files, but are in the files.</li>
+</ul>
+<p>Aside from errors in the patches themselves, there some common reasons for failures:</p>
+<ul class="simple">
+<li>Patches should be applied in commit sequence. If an early patch fails to add or delete
+a file, a later patch may get a file error by referring to the file.</li>
+<li>If a patch has several hunks that add lines to the file, the later hunks may appear to have
+incorrect start and count values because the early hunks were not applied.</li>
+<li>Similarly, a later patch may get an edit error by referring to lines that
+were not inserted or deleted by a previous patch that failed.</li>
+</ul>
+<p>These problems can sometimes be resolved by fixing and applying the early patch that failed.
+The &#8216;get_patch_patches&#8217; method of the <em>PatchSet</em> object can be used to reveal dependencies
+between patches.</p>
+<p>The most serious cause of failures is that other kernel developers have submitted patches
+that modify some of the same files as your patches, and that some of these patches have been
+integrated into Linux before yours. The most difficult case to resolve will be one in which
+another patch has partly fixed the same problem your patch is intended to fix, but does so
+with incompatible logic. You may only be able to resolve such a problem by rewriting
+your patches to work with your new kernel version. Alternately you may use the procedures shown
+in Example 5 of the <em>Helper</em> documentation to determine if you really need the patch.</p>
+<div class="section" id="id15">
+<h2>Examples<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h2>
+<p>For a file that is not in the target tree:</p>
+<div class="highlight-python"><div class="highlight"><pre>DIFF: &quot;diff --git a/include/linux/input/ti_am335x_tsc.h b/include/linux/input/ti_am335x_tsc.h&quot;
+   ERROR: &quot;a&quot; file not found: include/linux/input/ti_am335x_tsc.h
+</pre></div>
+</div>
+<p>For a file with invalid length:</p>
+<div class="highlight-python"><div class="highlight"><pre>DIFF: &quot;diff --git a/arch/arm/common/Kconfig b/arch/arm/common/Kconfig&quot;
+   HUNK: &quot;@@ -40,3 +40,6 @@ config SHARP_PARAM&quot;
+      ERROR: invalid old start or count for file: start=40, count=3, length=22
+
+Presumably the file previously had a greater length in the &quot;a&quot; version of the sources.
+As it happens, the addition specified by the hunk (&#39;+config TI_PRIV_EDMA&#39;) is in the target
+file. So the hunk is not needed.
+</pre></div>
+</div>
+<p>For a hunk whose lines can be shifted:</p>
+<div class="highlight-python"><div class="highlight"><pre>  DIFF: &quot;diff --git a/include/linux/mfd/ti_am335x_tscadc.h b/include/linux/mfd/ti_am335x_tscadc.h&quot;
+     HUNK: &quot;@@ -71,8 +71,6 @@&quot;
+        WARN:  &quot;merge&quot;  line not found at 71: &quot;#define STEPCONFIG_INM_ADCREFM  STEPCONFIG_INM(8)&quot;
+        WARN:  &quot;merge&quot;  line not found at 72: &quot;#define STEPCONFIG_INP_MASK     (0xF &lt;&lt; 19)&quot;
+        WARN:  &quot;merge&quot;  line not found at 73: &quot;#define STEPCONFIG_INP(val)     ((val) &lt;&lt; 19)&quot;
+        WARN:  &quot;merge&quot;  line not found at 74: &quot;#define STEPCONFIG_INP_AN4      STEPCONFIG_INP(4)&quot;
+        WARN:  &quot;merge&quot;  line not found at 75: &quot;#define STEPCONFIG_INP_ADCREFM  STEPCONFIG_INP(8)&quot;
+        WARN:  &quot;merge&quot;  line not found at 76: &quot;#define STEPCONFIG_FIFO1        BIT(26)&quot;
+        FIND:  &quot;merge&quot;  line found at 79: &quot;#define STEPCONFIG_INM_ADCREFM      STEPCONFIG_INM(8)&quot;
+        FIND:  &quot;merge&quot;  line found at 80: &quot;#define STEPCONFIG_INP_MASK (0xF &lt;&lt; 19)&quot;
+        FIND:  &quot;merge&quot;  line found at 81: &quot;#define STEPCONFIG_INP(val) ((val) &lt;&lt; 19)&quot;
+        FIND:  &quot;merge&quot;  line found at 82: &quot;#define STEPCONFIG_INP_AN4  STEPCONFIG_INP(4)&quot;
+        FIND:  &quot;merge&quot;  line found at 83: &quot;#define STEPCONFIG_INP_ADCREFM      STEPCONFIG_INP(8)&quot;
+        FIND:  &quot;merge&quot;  line found at 84: &quot;#define STEPCONFIG_FIFO1    BIT(26)&quot;
+
+For a patch whose additions have been applied::
+
+   PATCH: &quot;arm/0005-ARM-DTS-AM33XX-Add-PMU-support.patch&quot;
+      DIFF: &quot;diff --git a/arch/arm/boot/dts/am33xx.dtsi b/arch/arm/boot/dts/am33xx.dtsi&quot;
+           HUNK: &quot;@@ -48,6 +48,11 @@&quot;
+              WARN:  &quot;merge&quot;  line not found at 48: &quot;          };&quot;
+              WARN:  &quot;merge&quot;  line not found at 49: &quot;  };&quot;
+              WARN:  &quot;merge&quot;  line not found at 50: &quot;&quot;
+              INFO:  &quot;add&quot;    line not found at next line: &quot;   pmu {&quot;
+              INFO:  &quot;add&quot;    line not found at next line: &quot;           compatible = &quot;arm,cortex-a8-pmu&quot;;&quot;
+              INFO:  &quot;add&quot;    line not found at next line: &quot;           interrupts = &lt;3&gt;;&quot;
+              INFO:  &quot;add&quot;    line not found at next line: &quot;   };&quot;
+              INFO:  &quot;add&quot;    line not found at next line: &quot;&quot;
+              WARN:  &quot;merge&quot;  line not found at 51: &quot;  /*&quot;
+              WARN:  &quot;merge&quot;  line not found at 52: &quot;   * The soc node represents the soc top level view. It is uses for IPs&quot;
+              WARN:  &quot;merge&quot;  line not found at 53: &quot;   * that are not memory mapped in the MPU view or for the MPU itself.&quot;
+              FIND:  &quot;add&quot; line found at 69: &quot; pmu {&quot;
+              FIND:  &quot;add&quot; line found at 70: &quot;         compatible = &quot;arm,cortex-a8-pmu&quot;;&quot;
+              FIND:  &quot;add&quot; line found at 71: &quot;         interrupts = &lt;3&gt;;&quot;
+              FIND:  &quot;merge&quot; line found at 76: &quot;        * that are not memory mapped in the MPU view or for the MPU itself.&quot;
+       INFO:  1 patch errors
+
+  All of the &quot;add&quot; lines were found in the source file, although not at the locations where the patch expected
+  to insert them. Thus the patch is not needed.
+
+  For a patch whose deletions have been applied::
+
+      HUNK: &quot;@@ -127,7 +138,7 @@ static int tiadc_read_raw(struct iio_dev *indio_dev,&quot;
+        WARN:  &quot;merge&quot;  line not found at 127: &quot;               if (i == chan-&gt;channel)&quot;
+        WARN:  &quot;merge&quot;  line not found at 128: &quot;                       *val = readx1 &amp; 0xfff;&quot;
+        WARN:  &quot;merge&quot;  line not found at 129: &quot;       }&quot;
+        ERROR: &quot;delete&quot; line not found at 130: &quot;       am335x_tsc_se_update(adc_dev-&gt;mfd_tscadc);&quot;
+        WARN:  &quot;merge&quot;  line not found at 131: &quot;&quot;
+        WARN:  &quot;merge&quot;  line not found at 132: &quot;       return IIO_VAL_INT;&quot;
+        WARN:  &quot;merge&quot;  line not found at 133: &quot;}&quot;
+
+  Note that the *Checker&#39;s* find logic only looks for significant lines, so it did not search for &#39;};&#39;, etc.
+  The logic also did not find the line starting with &#39;* The soc node&#39;, which is in the file, but with a slightly
+  different spelling.
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html#document-index">Table Of Contents</a></h3>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-_rest/manual">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#installation-setup">Installation/Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#python-installation">Python Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#standalone-source">Standalone Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#data-files">Data Files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#modules">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#major-modules">Major Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#supporting-modules">Supporting Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#archive">Archive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#checker">Checker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#command">Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#finder">Finder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#jsonconfig">JSONConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#matcher">Matcher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#patch">Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#patchset">PatchSet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#strings">Strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#viewer">Viewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#walker">Walker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#watcher">Watcher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#helper">Helper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#configuration">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#exceptions">Exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#system-considerations">System Considerations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#examples">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#example-1-basic-features">Example 1 &#8211; Basic Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#example-2-viewer-1">Example 2 &#8211; Viewer 1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#example-3-viewer-2">Example 3 &#8211; Viewer 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#example-4-am33xx-drivers">Example 4 &#8211; AM33XX Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#example-5-dts-study">Example 5 &#8211; DTS Study</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#example-6-tsc-adc-study">Example 6 &#8211; TSC/ADC Study</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#example-7-cape-manager-study">Example 7 &#8211; Cape Manager Study</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#classes-api">Classes API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id1">Archive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id2">Checker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id3">Finder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id4">Viewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id5">Walker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id6">Watcher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#diff">Diff</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#hunk">Hunk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id7">JSONConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id8">Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id9">PatchSet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#ptobject">PTObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id10">Strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id11">Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#exceptionhandler">ExceptionHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id13">Helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id14">Matcher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#appendix-a-patch-basics">Appendix A &#8211; Patch Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#appendix-b-patch-archives">Appendix B &#8211; Patch Archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#appendix-c-examples">Appendix C - Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#appendix-d-software-design">Appendix D - Software Design</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#program-structure">Program structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#implementation">Implementation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#appendix-d-checker-vs-quilt-vs-git-am">Appendix D - Checker vs. quilt vs &#8216;git am&#8217;</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#appendix-e-checker-output">Appendix E - Checker Output</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id15">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li><a href="index.html#document-index">PatchTools 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Milton Mobley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

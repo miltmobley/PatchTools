@@ -1,0 +1,64 @@
+#
+# This file describes the patches in RCN's kernel-3.8 package, as modified for my project.
+# Lines preceded by '#NU' indicate patch folders I won't use.
+#
+
+{
+	"sourcedir" : "/home/milton/Projects/Linux/Kernels/v-3.16.1-dev",
+	"patchdir"	: "/home/milton/Projects/Eclipse/Linux/PatchTools/data/patches-3.8",
+	"tempdir"   : "/home/milton/tmp",
+	"datadir"   : "/home/milton/Projects/Eclipse/Linux/PatchTools/data",
+	
+	"patchset" : {
+	
+		"groups" : [
+			"dma",
+			"rtc",
+			"pinctrl",
+			"cpufreq",
+			"adc",
+			"i2c",
+			"da8xx-fb",
+			"pwm",
+			"mmc",
+			"crypto",
+			#NU "6lowpan",
+			"capebus",
+			"arm",
+			"omap",
+			"omap_sakoman",
+			"omap_beagle_expansion",
+			"omap_beagle",
+			"omap_panda",
+			"net",
+			"drm",
+			"not-capebus",
+			"pru",
+			"usb",
+			"PG2",
+			"reboot",
+			"iio",
+			"w1",
+			"gpmc",
+			"mxt",
+			"ssd130x",
+			"build",
+			"hdmi",
+			"audio",
+			"resetctrl",
+			"camera",
+			"resources",
+			"pmic",
+			"pps",
+			"leds",
+			"capes",
+			"proto",
+			"fixes",
+			"machinekit",
+			
+			# The following groups were not included in the shell script:
+			"pm"
+			#NU "preempt-rt"	
+		]
+	}
+}

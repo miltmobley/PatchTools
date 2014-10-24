@@ -1,0 +1,46 @@
+From 4443d9ce936436d4b83aed7eb6d643b3088fe8d5 Mon Sep 17 00:00:00 2001
+From: Jan Luebbe <jluebbe@debian.org>
+Date: Wed, 6 Mar 2013 16:38:40 +0100
+Subject: [PATCH 105/184] beaglebone: LCD7 cape: enable PWM and allow the
+ specified mode
+
+---
+ firmware/capes/BB-BONE-LCD7-01-00A2.dts |   15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/firmware/capes/BB-BONE-LCD7-01-00A2.dts b/firmware/capes/BB-BONE-LCD7-01-00A2.dts
+index c13fe80..dc31da7 100644
+--- a/firmware/capes/BB-BONE-LCD7-01-00A2.dts
++++ b/firmware/capes/BB-BONE-LCD7-01-00A2.dts
+@@ -71,6 +71,20 @@
+ 	};
+ 
+ 	fragment@1 {
++		target = <&epwmss1>;
++		__overlay__ {
++			status = "okay";
++		};
++	};
++
++	fragment@2 {
++		target = <&ehrpwm1>;
++		__overlay__ {
++			status = "okay";
++		};
++	};
++
++	fragment@3 {
+ 		target = <&ocp>;
+ 
+ 		__overlay__ {
+@@ -220,6 +234,7 @@
+ 				interrupts = <36>;
+ 				ti,hwmods = "lcdc";
+ 				ti,power-gpio = <&gpio2 31 0x0>;
++				ti,allow-non-reduced-blanking-modes;
+ 			};
+ 
+ 		};
+-- 
+1.7.9.5
+

@@ -1,0 +1,12 @@
+not-capebus/0030-capemgr-Beaglebone-capemanager.patch
+not-capebus/0070-capemgr-Remove-__devinit-__devexit.patch
+not-capebus/0103-bone-capemgr-Make-sure-cape-removal-works.patch
+not-capebus/0104-bone-capemgr-Fix-crash-when-trying-to-remove-non-exi.patch
+not-capebus/0128-capemgr-Added-module-param-descriptions.patch
+not-capebus/0116-bone-capemgr-Force-a-slot-to-load-unconditionally.patch
+not-capebus/0151-capemgr-Implement-disable-overrides-on-the-cmd-line.patch
+resetctrl/0002-capemgr-Implement-cape-priorities.patch
+resources/0001-bone-capemgr-Introduce-simple-resource-tracking.patch
+resources/0005-capemgr-Add-enable_partno-parameter.patch
+resources/0023-capemgr-Retry-loading-when-failure-to-find-firmware.patch
+capes/0008-capemgr-Priority-on-capemgr.enable_partno-option.patch

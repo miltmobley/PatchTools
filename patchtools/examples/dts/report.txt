@@ -1,0 +1,227 @@
+PG2/0001-beaglebone-black-1ghz-hack.patch
+-- FIX
+
+adc/0007-arm-dts-AM335x-evm-Add-TSC-ADC-MFD-device-support.patch
+-- N/N
+
+arm/0005-ARM-DTS-AM33XX-Add-PMU-support.patch
+-- N/N
+
+capebus/0005-beaglebone-create-a-shared-dtsi-for-beaglebone-based.patch
+-- N/U, not using capes, capemgr
+
+capebus/0006-beaglebone-enable-emmc-for-bonelt.patch
+-- FIX?
+
+capes/0009-bone-add-protocape-GPS.patch
+-- N/U, not using capes, capemgr
+
+capes/0014-Added-alias-for-BeBoPrs-with-old-EEPROM-device-id-21.patch
+-- N/U, not using capes, capemgr
+
+capes/0024-add-support-for-weather-cape-rev-b.patch
+-- N/U, not using capes, capemgr
+
+cpufreq/0001-am33xx-DT-add-commented-out-OPP-values-for-ES2.0.patch
+-- FIX? are the adds in previous patch?
+
+crypto/0008-ARM-dts-Add-SHAM-data-and-documentation-for-AM33XX.patch
+-- FIX? + N/N
+
+crypto/0015-ARM-dts-Add-AES-data-and-documentation-for-AM33XX.patch
+-- FIX? + N/N
+
+da8xx-fb/0021-ARM-dts-AM33XX-Add-lcdc-node.patch
+-- N/N
+
+da8xx-fb/0028-ARM-dts-AM33XX-Add-PWMSS-device-tree-nodes.patch
+-- N/N
+
+dma/0018-ARM-dts-add-AM33XX-EDMA-support.patch
+-- FIX?
+
+dma/0023-ARM-dts-add-AM33XX-MMC-support.patch
+-- N/N
+
+dma/0026-ARM-dts-add-AM33XX-SPI-DMA-support.patch
+-- N/N
+
+fixes/0003-beaglebone-switch-uSD-to-4-bit-mode.patch
+-- N/N
+
+gpmc/0039-gpmc-Add-DT-node-for-gpmc-on-am33xx.patch
+-- N/N
+
+i2c/0002-Bone-DTS-working-i2c2-i2c3-in-the-tree.patch
+-- N/N
+
+i2c/0003-am33xx-Convert-I2C-from-omap-to-am33xx-names.patch
+-- N/N
+
+mmc/0001-am33xx.dtsi-enable-MMC-HSPE-bit-for-all-3-controller.patch
+-- N/N?
+
+not-capebus/0001-add-dvi-pinmuxes-to-am33xx.dtsi.patch
+-- N/U
+
+not-capebus/0003-am33xx-musb-Add-OF-definitions.patch
+-- N/N or FIX?
+
+not-capebus/0008-am335x-bone-dtsi-Clean-up.patch
+-- N/N and FIX?
+
+not-capebus/0009-am335x-bone-dtsi-Introduce-new-I2C-entries.patch
+-- FIX or N/U?
+
+not-capebus/0010-am335x-dt-Add-I2C0-pinctrl-entries.patch
+-- N/N
+
+not-capebus/0011-Cleanup-am33xx.dtsi.patch
+-- N/U
+
+not-capebus/0032-capemgr-am33xx-family-DT-bindings.patch
+-- N/U
+
+not-capebus/0039-capemgr-Add-weather-cape-definition.patch
+-- N/U
+
+not-capebus/0040-ehrpwm-add-missing-dts-nodes.patch
+-- N/N
+
+not-capebus/0041-am33xx-DT-Update-am33xx.dsi-with-the-new-PWM-DT-bind.patch
+-- N/N
+
+not-capebus/0048-boneblack-Add-default-HDMI-cape.patch
+-- N/U
+
+not-capebus/0050-am33xx.dtsi-Make-the-MUSB-not-crash-on-load.patch
+-- N/N  + FIX?
+
+not-capebus/0058-am33xx-Add-mcasp0-and-mcasp1-device-tree-entries.patch
+-- N/N
+
+not-capebus/0059-ASoC-dts-OMAP2-AM33xx-HACK-Add-missing-dma-info.patch
+-- FIX or N/U
+
+not-capebus/0062-am33xx-mcasp-Add-dma-channel-definitions.patch
+-- FIX or N/U
+
+not-capebus/0074-capes-add-dvi-a2-and-lcd3-a2-dts-files.patch
+-- FIX? + N/U
+
+not-capebus/0080-HACK-am33xx.dtsi-enable-all-PWMs.patch
+-- FIX?
+
+not-capebus/0082-beaglebone-Add-nixie-cape-device-tree-entry.patch
+-- N/U
+
+not-capebus/0083-am335x-bone-common.dtsi-Cleanup-test-remnants.patch
+-- N/N
+
+not-capebus/0085-bone-common-ti-vcc-aux-disable-is-sleep-enable.patch
+-- FIX? + N/U
+
+not-capebus/0086-am33xx-disable-NAPI.patch
+-- FIX or N/U
+
+not-capebus/0088-am33xx.dtsi-remove-duplicate-nodes.patch
+-- FIX?
+
+not-capebus/0090-beaglebone-uncomment-eMMC-override.patch
+-- N/U
+
+not-capebus/0092-am33xx.dtsi-Update-and-disable-status-of-nodes.patch
+-- N/U
+
+not-capebus/0099-beaglebone-switch-eMMC-to-8bit-mode.patch
+-- N/N
+
+not-capebus/0115-am335x-bone-common-Remove-SPI-unused-pinmux-config.patch
+-- N/N
+
+not-capebus/0117-beaglebone-Added-Adafruit-prototype-cape.patch
+-- N/U
+
+not-capebus/0120-BBB-tester-Introduce-board-DTS.patch
+-- N/U
+
+not-capebus/0129-beaglebone-Add-Adafruit-RTC-prototype-cape.patch
+-- N/U
+
+not-capebus/0131-capes-add-cape-for-beaglebone-based-Hexy-robot.patch
+-- N/U
+
+not-capebus/0147-firmware-capes-Update-MRF24J40-cape-to-work-with-lat.patch
+-- N/U
+
+not-capebus/0148-am335x-bone-common-DT-Override-for-MRF24J40-Cape.patch
+-- N/U
+
+not-capebus/0149-beaglebone-black-limit-LDO3-to-1.8V.patch
+-- N/N
+
+not-capebus/0150-beaglebone-black-add-new-fixed-regulator-for-uSD-eMM.patch
+-- N/N
+
+not-capebus/0154-beaglebone-add-support-for-DVI-00A3.patch
+-- N/U
+
+not-capebus/0158-cape-Add-CAPE-BONE-EXPTEST-to-capemaps.patch
+-- N/U
+
+not-capebus/0173-am33xx-Update-DTS-EDMA.patch
+-- FIX + N/N
+
+not-capebus/0174-bone-Added-RS232-prototype-cape-DT-object.patch
+-- N/U
+
+pm/0060-ARM-DTS-AM33XX-Add-nodes-for-OCMC-RAM-and-WKUP-M3.patch
+-- ???
+
+pm/0062-ARM-OMAP2-AM33XX-timer-Interchance-clkevt-and-clksrc.patch
+-- FIX + N/N
+
+pmic/0002-dt-bone-common-Add-interrupt-for-PMIC.patch
+-- FIX?
+
+pru/0003-ARM-dts-AM33xx-PRUSS-support.patch
+-- FIX?
+
+pwm/0008-HACK-am33xx.dtsi-turn-on-all-PWMs.patch
+-- N/N
+
+resetctrl/0001-boneblack-Remove-default-pinmuxing-for-MMC1.patch
+-- N/N
+
+resetctrl/0005-bone-Add-rstctl-DT-binding-for-beaglebone.patch
+-- FIX if need reset-controller
+
+resetctrl/0009-bone-Put-priorities-in-built-in-capes.patch
+-- FIX + N/U
+
+resetctrl/0010-bone-common-dtsi-remove-reset-cape.patch
+-- N/U?
+
+resources/0007-bbb-Add-a-fall-back-non-audio-HDMI-cape.patch
+-- N/U
+
+resources/0014-Fix-mmc2-being-enabled-when-eMMC-is-disabled.patch
+-- FIX?
+
+resources/0018-bone-renamed-adafruit-RTC-cape.patch
+-- N/U
+
+resources/0021-hwmon-add-driver-for-the-AM335x-bandgap-temperature-.patch
+-- FIX if need 'bandgap temperature sensor'
+
+resources/0024-arm-bone-dts-add-CD-for-mmc1.patch
+-- FIX?
+
+rtc/0003-ARM-dts-AM33XX-Set-pmic-shutdown-controller-for-Beag.patch
+-- N/N
+
+usb/0009-MUSB-Hack-around-to-make-host-port-to-work.patch
+-- N/U "should not change generic kernel modules to fix a device specific problem"
+
+usb/0011-ARM-OMAP-am335x-musb-use-250-for-power.patch
+-- FIX? not if follow on to usb/0009

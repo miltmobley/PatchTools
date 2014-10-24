@@ -1,0 +1,6 @@
+[
+"pwm/0006-pwm-pwm-tiehrpwm-Update-the-clock-handling-of-pwm-ti.patch: 15: drivers/pwm/pwm-tiehrpwm.c |    4 ++--",
+"pwm/0006-pwm-pwm-tiehrpwm-Update-the-clock-handling-of-pwm-ti.patch: 18: diff --git a/drivers/pwm/pwm-tiehrpwm.c b/drivers/pwm/pwm-tiehrpwm.c",
+"pwm/0006-pwm-pwm-tiehrpwm-Update-the-clock-handling-of-pwm-ti.patch: 20: --- a/drivers/pwm/pwm-tiehrpwm.c",
+"pwm/0006-pwm-pwm-tiehrpwm-Update-the-clock-handling-of-pwm-ti.patch: 21: +++ b/drivers/pwm/pwm-tiehrpwm.c"
+]

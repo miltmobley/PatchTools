@@ -1,0 +1,10 @@
+patchdir  = "quilt/patches":
+sourcedir = "quilt":
+
+PATCH: "not-capebus/0116-bone-capemgr-Force-a-slot-to-load-unconditionally.patch"
+   DIFF: "diff --git a/drivers/misc/cape/beaglebone/capemgr.c b/drivers/misc/cape/beaglebone/capemgr.c"
+      HUNK: "@@ -568,6 +568,10 @@ static int bone_is_compatible_override(struct device_node *node,"
+   INFO:  1 patch errors
+
+Summary:
+   0 passed, 0 skipped, 1 tested

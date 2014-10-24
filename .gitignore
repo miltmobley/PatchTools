@@ -1,0 +1,14 @@
+#
+# Normal rules
+#
+
+*.prefs
+.project
+.pydevproject
+
+#
+# Generated files
+#
+*.pyc
+*.pyo
+

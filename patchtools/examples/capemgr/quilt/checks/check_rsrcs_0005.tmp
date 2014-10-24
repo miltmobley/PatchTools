@@ -1,0 +1,25 @@
+patchdir  = "quilt/patches":
+sourcedir = "quilt":
+
+PATCH: "resources/0005-capemgr-Add-enable_partno-parameter.patch"
+   DIFF: "diff --git a/drivers/misc/cape/beaglebone/capemgr.c b/drivers/misc/cape/beaglebone/capemgr.c"
+      HUNK: "@@ -57,6 +57,13 @@ module_param(disable_partno, charp, 0444);"
+      HUNK: "@@ -1812,10 +1819,12 @@ bone_capemgr_probe(struct platform_device *pdev)"
+         FIND:  "add"    line found at 622: "	const char *version;"
+         FIND:  "add"    line found at 665: "	const char *version;"
+      HUNK: "@@ -1996,6 +2005,62 @@ bone_capemgr_probe(struct platform_device *pdev)"
+         FIND:  "add"    line found at 719: "			if (p == NULL)"
+         FIND:  "add"    line found at 897: "			if (p == NULL)"
+         FIND:  "add"    line found at 585: "				e = s + strlen(s);"
+         FIND:  "add"    line found at 1052: "					part_number, version ? version : "N/A");"
+         FIND:  "add"    line found at 1096: "			slot = bone_capemgr_add_slot(info, NULL,"
+         FIND:  "add"    line found at 1079: "					part_number, version);"
+         FIND:  "add"    line found at 1097: "					part_number, version);"
+         FIND:  "add"    line found at 1099: "			if (IS_ERR_OR_NULL(slot)) {"
+         FIND:  "add"    line found at 1082: "					atomic_read(&info->next_slot_nr) - 1);"
+         FIND:  "add"    line found at 1101: "					atomic_read(&info->next_slot_nr) - 1);"
+      HUNK: "@@ -2009,6 +2074,7 @@ bone_capemgr_probe(struct platform_device *pdev)"
+   INFO:  4 patch errors
+
+Summary:
+   0 passed, 0 skipped, 1 tested

@@ -1,0 +1,11 @@
+runner: output: Applying patch capes/0008-capemgr-Priority-on-capemgr.enable_partno-option.patch
+patching file drivers/misc/cape/beaglebone/capemgr.c
+Hunk #1 succeeded at 178 (offset 3 lines).
+Hunk #2 succeeded at 1086 (offset 3 lines).
+Hunk #3 succeeded at 1104 (offset 3 lines).
+Hunk #4 succeeded at 1618 (offset 5 lines).
+Hunk #5 succeeded at 1637 (offset 5 lines).
+Hunk #6 succeeded at 1895 (offset 71 lines).
+Hunk #7 succeeded at 2065 (offset 71 lines).
+Hunk #8 succeeded at 2092 (offset 71 lines).
+Hunk #9 succeeded at 2109 (offset 71 lines).

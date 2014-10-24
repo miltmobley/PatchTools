@@ -1,0 +1,11 @@
+[
+"da8xx-fb/0028-ARM-dts-AM33XX-Add-PWMSS-device-tree-nodes.patch: 31: +\t\t\tcompatible = \"ti,am33xx-pwmss\";",
+"da8xx-fb/0028-ARM-dts-AM33XX-Add-PWMSS-device-tree-nodes.patch: 59: +\t\t\tcompatible = \"ti,am33xx-pwmss\";",
+"da8xx-fb/0028-ARM-dts-AM33XX-Add-PWMSS-device-tree-nodes.patch: 87: +\t\t\tcompatible = \"ti,am33xx-pwmss\";",
+"not-capebus/0041-am33xx-DT-Update-am33xx.dsi-with-the-new-PWM-DT-bind.patch: 52: +\t\t\tcompatible = \"ti,am33xx-pwmss\";",
+"not-capebus/0041-am33xx-DT-Update-am33xx.dsi-with-the-new-PWM-DT-bind.patch: 82: +\t\t\tcompatible = \"ti,am33xx-pwmss\";",
+"not-capebus/0041-am33xx-DT-Update-am33xx.dsi-with-the-new-PWM-DT-bind.patch: 112: +\t\t\tcompatible = \"ti,am33xx-pwmss\";",
+"not-capebus/0088-am33xx.dtsi-remove-duplicate-nodes.patch: 20: -\t\t\tcompatible = \"ti,am33xx-pwmss\";",
+"not-capebus/0088-am33xx.dtsi-remove-duplicate-nodes.patch: 50: -\t\t\tcompatible = \"ti,am33xx-pwmss\";",
+"not-capebus/0088-am33xx.dtsi-remove-duplicate-nodes.patch: 80: -\t\t\tcompatible = \"ti,am33xx-pwmss\";"
+]

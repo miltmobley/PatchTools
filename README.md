@@ -1,8 +1,6 @@
 PatchTools
 ==========
 
-Python based patch analysis tools
-
 Do you need to apply GIT patches to a different source version than the one on
 which they were developed? PatchTools can greatly accelerate the process of determining
 whether the patches are needed by the new source, and how to fix them if they are needed.
@@ -19,17 +17,23 @@ Features
 Installation
 ------------
 
-To install PatchTools from PyPi, simply enter::
+From PyPi::
 
     $ sudo pip install patchtools
     
-To install PatchTools from a source tarball, obtain the tarball from pypi.org,
-extract the files to a suitable location, and in the root folder, enter::
+From a source archive:
+
+  Obtain the archive from pypi.org, extract the files, and in the root folder, enter::
 
     $ sudo python setup.py install
+
+From the GIT repo::
+
+    $ git clone http://github.com/miltmobley/PatchTools
     
     
 Documentation
 -------------
 
-Documentation is available in the 'doc' folder of the source tarball.
+Documentation is available in the 'doc' folder of the source.
+

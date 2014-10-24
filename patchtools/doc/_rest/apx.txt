@@ -1,0 +1,378 @@
+
+Appendix A -- Patch Basics
+==========================
+
+For a number of years, the Linux kernel source has been managed by the GIT source
+code control system. Normally you will use GIT commands to obtain and update kernels.
+GIT uses patches to modify the kernel sources. Linux kernel patches are usually produced
+by running the 'git format-patch' command, which commits your changes if needed,
+and also generates the patches.
+
+A typical patch file is "0002-ARM-OMAP-Hack-AM33xx-clock-data-to-allow-JTAG-use.patch"::
+
+	From ac9bb90cbb8c81dd384e339063e72d2fc90221c2 Mon Sep 17 00:00:00 2001
+	From: Matt Porter <mporter@ti.com>
+	Date: Mon, 7 Jan 2013 11:55:00 -0500
+	Subject: [PATCH 02/35] ARM: OMAP: Hack AM33xx clock data to allow JTAG use
+
+	The debugss interface clock must remain enabled at init
+	in order to prevent an attached JTAG probe from hanging.
+
+	Signed-off-by: Matt Porter <mporter@ti.com>
+	---
+	arch/arm/mach-omap2/cclock33xx_data.c |    2 +-
+	 1 file changed, 1 insertion(+), 1 deletion(-)
+
+	diff --git a/arch/arm/mach-omap2/cclock33xx_data.c b/arch/arm/mach-omap2/cclock33xx_data.c
+	index ea64ad6..a09d6d7 100644
+	--- a/arch/arm/mach-omap2/cclock33xx_data.c
+	+++ b/arch/arm/mach-omap2/cclock33xx_data.c
+	@@ -428,7 +428,7 @@ DEFINE_STRUCT_CLK(smartreflex1_fck, dpll_core_ck_parents, clk_ops_null);
+ 	 *     - usbotg_fck (its additional clock and not really a modulemode)
+	 *     - ieee5000
+	 */
+	-DEFINE_CLK_GATE(debugss_ick, "dpll_core_m4_ck", &dpll_core_m4_ck, 0x0,
+	+DEFINE_CLK_GATE(debugss_ick, "dpll_core_m4_ck", &dpll_core_m4_ck, ENABLE_ON_INIT,
+	 				 AM33XX_CM_WKUP_DEBUGSS_CLKCTRL, AM33XX_MODULEMODE_SWCTRL_SHIFT,
+	 				 0x0, NULL);
+	 
+	-- 
+	1.7.10.4
+	
+This format is a variation on the 'diff -urN' format that is sometimes described in the literature,
+and is still used in application packages. The patch content in this format is the body of an email
+message. The patch may have one or more 'diff' sections that refer to the same or different
+files, and each diff section may have one or more 'hunk' sections (marked by lines starting with '@@').
+
+See <http://wikipedia.org/wiki/Diff> for basic information on diff formats.
+
+Note that:
+
+* The 'a' at the start of a path denotes the original/old version of the kernel tree.
+* The 'b' at the start of a path denotes the patched/new version of the kernel tree.
+* Paths in the diff line are nominal paths.
+* The index line identifies the commit state before and after applying the patch (see below).
+* A '---' line contains the actual path of an "a" file, or '/dev/null'.
+* A '+++' line contains the actual path of a "b" file, or '/dev/null'.
+* The '@@' lines indicate 'hunks' (ranges over which following edit lines are to be applied).
+* The -m,n values indicate the start line number and length of the hunk information in the "a" (old) file.
+* The +m,n values indicate the start line number and length of the hunk information in the "b" (new) file.
+* Line numbers are 1-based.
+* An edit line starting with '+' indicates an addition to the old version to obtain the new version.
+* An edit line starting with '-' indicates a deletion from the old version to obtain the new version.
+* An edit line that starts with ' ' is in both files, but possibly at different line numbers.
+  Such lines are called 'merge' lines in the *Checker* output.
+* Lines that appear to be blank in a hunk are part of the hunk data.
+* A 'delete' line followed by an 'add' line constitutes a 'change' request.
+
+In hunk lines (that begin with '@@') the text after the second '@@' is termed a 'hunk note' in the
+PatchTools source code. Hunk notes appear to be copies of the closest previous source line that
+has a character in the first column, e.g. function declaration lines and label lines in a .c file.
+Hunk notes are useful in finding text that is not in the location expected by a patch, but may not
+be unique if the file uses conditional compilation (e.g. "#ifdef FOO").
+
+The index line contains values obtained from the SHA1 checksums computed on the commit states before
+and after applying the patch on the patch developer's system. When possible, a short unique prefix
+of a checksum is used.
+
+Some special cases are handled differently by GIT than by 'diff -urN':
+
+Addition of a new file to the tree::
+
+	diff --git ...
+	new file mode 100644
+	index ea64ad6..a09d6d7 100644
+	--- /dev/null
+	+++ b/arch/arm/mach-omap2/cclock33xx_data.c
+	@@ -0,0 +1,n @@ ...
+	...
+    
+where n is the number of lines in the new file.
+
+Removal of an old file from the tree::
+
+	diff --git ...
+	deleted file mode 100644
+	index ea64ad6..a09d6d7 100644
+	--- a/arch/arm/mach-omap2/cclock33xx_data.c
+	+++ /dev/null
+	@@ -1,n  +0,0 @@ ...
+	...
+
+where n is the number of lines in the old file.
+
+Addition of a binary file to the tree::
+
+	diff --git ...
+	new file mode 100755
+	index <old git index> .. <new git index>
+	GIT binary patch
+	literal 11764
+	zcmds7eQ;dWb-! ...
+
+The *Checker* does not handle binary patches.
+
+Appendix B -- Patch Archives
+============================
+
+Each kernel released by kernel.org has an associated "patch" file shown on the site's
+main page, which you can download. The file is an 'xz' archive that contains a single
+text file which is the concatenation of the diff sections from all the patches that
+were applied to produce the kernel version. Note that the file does not contain patch
+file names, since the patches were submitted to kernel.org as email messages. The archive
+also does not contain other information from the patch headers such as 'Author', 'Date', etc.
+
+Some data values in the diffs may be different than the corresponding values in the submitted patch files.
+A patch is submitted by an author as an email message. If the patch is accepted for inclusion into the kernel,
+the author will later receive some message like "please rebase your patch to the tip of branch x". Rebasing may
+involve changing the hunk line numbers and possibly the text of edits. The kernel developer/maintainer will
+apply the changed patch. Consequently the index checksums will be different than those in the patch,
+and the hunk line numbers and edits may also differ.
+
+Appendix C - Examples
+=====================
+
+Examples are found in the examples folder, and are coded using the *Helper* class for convenience.
+
+PatchTools was developed using a fairly large set of patches assembled by eLinux.org
+to create an embedded Ubuntu version based on Linux kernel version 3.8.13
+that could be used with the well known "BeagleBone" embedded computers, which use ARM based
+processors provided by Texas Instruments. Contact eLinux.org to get the patches.
+
+We have used various other kernels for testing; most recently a stable kernel with
+version number 3.16.1 was used.
+
+The source files 'config.json' shows how to set up configuration data for the *Helper*,
+which uses a JSONConfig object to store and access the data.
+
+After studying the *Helper* documentation, you can embark on experiments related to your project.
+
+
+Appendix D - Software Design
+============================
+
+Program structure
+-----------------
+
+PatchTools is implemented with Python new style classes, for consistency of style, and to allow
+integration of its components into other scripts or processes.
+
+Class constructors process parameters that are expected not to change between invocations,
+while instance methods process parameters that are different in each invocation.
+For example::
+
+    c = Checker({ 'patchdir' : <path to patch dir>, 'sourcedir' : <path to kernel dir> })
+    r = c.check(<patchname1>)
+    s = c.check(<patchname2>)
+
+Class constructors have a single dict argument to receive parameters. 
+
+Instance methods usually have one or two target file parameters, and may have a dict argument to receive context data.
+
+Since parameter values are provided by end users, extensive validation is performed on the values.
+
+The *Helper* class provides convenient wrappers for the classes and useful utility functions.
+It can be used as shown in the examples.
+
+
+Implementation
+--------------
+
+The software has been implemented using the Kepler version of Eclipse with the PyDev plugin on a Linux Mint16
+system. Use of these tools for further development is not required, but if they are not used, some additional
+setup may be needed.
+
+All import statements use this form::
+
+    from patchtools.lib.utils.functions import Functions as ut
+
+This verbose form will prevent components in other packages from being found in the Python path
+when the intention is to import a PatchTools component. On launching a program the Python interpreter
+builds a sys.path variable including some standard locations and the value of the environment
+variable PYTHONPATH if it is defined. 
+
+If PatchTools is not installed in your Python system, Python will only be able to find it if PYTHONPATH is set
+correctly. To match the absolute paths as shown above, PYTHONPATH should point to the directory that includes
+the patchtools, not to the patchtools directory itself.
+
+Eclipse-PyDev may not configure PYTHONPATH correctly if you are not careful, and also adds a large set of folders
+to the Python path. You can edit the Eclipse PYTHONPATH variable on the project's properties page.
+
+PYTHONPATH won't normally be defined in your environment when, for example, you try to launch an application
+in a shell. On Linux, you can overcome this problem by exporting a value from your .profile file or by wrapping
+calls to the application file in a script (call it 'do_run')::
+
+    PYTHONPATH=`pwd` ; $@
+  
+which may be used like so::
+
+    ./do_run test_app.py
+    
+The do_run script should be located in the parent directory of patchtools to get a correct value for PYTHONPATH.
+
+
+Appendix D - Checker vs. quilt vs 'git am'
+==========================================
+
+The *Checker* analyzes patches and source code, and reports problems to the user. It does not try to fix a patch
+or make it fit the source. 
+
+Quilt and 'git am' will detect the same sort of problems as the the *Checker* does in their analysis of patches
+and sources. Quilt and 'git am' will try to resolve some of these problems by shifting patch lines elsewhere in
+the source file, sometimes by a large distance. But they will reject patches that cannot be fixed in this simple
+way.
+
+Quilt will notify you that it has shifted lines to make a hunk fit the source, but 'git am' does not.
+
+Inspection of typical *Checker* output gathered on the 'patches-3.8' patch set shows a sizable number of
+different patterns of mismatch between patches and source files. Many of these patterns will be too complex
+for quilt or 'git am' to fix. But the *Checker* can show you in great detail what is wrong with the patches,
+and can allow you to develop a strategy to fix them.
+
+It is also possible that the simplistic fixing strategies pursued by quilt and 'git am' may not produce a
+correct result, or may hide from you that there is a problem in the code. In the 'capemgr' tests in the
+'examples' folder, it was observed that quilt shifted the last few hunks in the last patch by about 71 lines,
+and that 'git am' probably did also, but did not report doing so. Both programs claimed to have applied the
+patches successfully.
+
+From the *Checker* output it appears that the next to last version of capemgr.c (produced by the 'resources/0023...'
+patch) had about 70 lines of extra text that was not expected to be present by the last patch. And examining the
+last two patches shows they both have the same 'before' checksum value in their index lines, which is incorrect.
+You may wish to investigate why this is so.
+
+The *Checker* does not create any work files in the source tree, modify either the source or the patch files,
+require you to use a specific folder structure, or require you to have GIT metadata in the source tree.
+
+Quilt requires you to create a tree of work files including the patches and kernel directory, and also requires
+you to reset the source files targeted by the patches to their original versions each time you run it to test
+a set of patches. It also requires you to reset the 'applied-patches' file to the empty state.
+
+'git am', of course, can only be used in a "working directory", i.e. a source tree that has been obtained
+from a GIT repo, and has GIT metadata.
+
+
+Appendix E - Checker Output
+===========================
+
+The *Checker* emits various kinds of error messages:
+
+* "a" files missing from the target source tree.
+
+* "b" files incorrectly present in the target tree.
+
+* Format errors in the patch file.
+
+* Incorrect start or count values in the hunk specification lines.
+
+* Lines that are supposed to be in "a" source files, but are not at the specified locations.
+
+* Lines that are supposed to be absent from "a" source files, but are in the files.
+
+Aside from errors in the patches themselves, there some common reasons for failures:
+
+* Patches should be applied in commit sequence. If an early patch fails to add or delete
+  a file, a later patch may get a file error by referring to the file.
+  
+* If a patch has several hunks that add lines to the file, the later hunks may appear to have
+  incorrect start and count values because the early hunks were not applied.
+
+* Similarly, a later patch may get an edit error by referring to lines that
+  were not inserted or deleted by a previous patch that failed.
+
+These problems can sometimes be resolved by fixing and applying the early patch that failed.
+The 'get_patch_patches' method of the *PatchSet* object can be used to reveal dependencies
+between patches.
+
+The most serious cause of failures is that other kernel developers have submitted patches
+that modify some of the same files as your patches, and that some of these patches have been
+integrated into Linux before yours. The most difficult case to resolve will be one in which
+another patch has partly fixed the same problem your patch is intended to fix, but does so
+with incompatible logic. You may only be able to resolve such a problem by rewriting
+your patches to work with your new kernel version. Alternately you may use the procedures shown
+in Example 5 of the *Helper* documentation to determine if you really need the patch.
+
+Examples
+--------
+
+For a file that is not in the target tree::
+
+   DIFF: "diff --git a/include/linux/input/ti_am335x_tsc.h b/include/linux/input/ti_am335x_tsc.h"
+      ERROR: "a" file not found: include/linux/input/ti_am335x_tsc.h
+
+For a file with invalid length::
+
+   DIFF: "diff --git a/arch/arm/common/Kconfig b/arch/arm/common/Kconfig"
+      HUNK: "@@ -40,3 +40,6 @@ config SHARP_PARAM"
+         ERROR: invalid old start or count for file: start=40, count=3, length=22
+         
+   Presumably the file previously had a greater length in the "a" version of the sources.
+   As it happens, the addition specified by the hunk ('+config TI_PRIV_EDMA') is in the target
+   file. So the hunk is not needed.
+         
+For a hunk whose lines can be shifted::
+
+   DIFF: "diff --git a/include/linux/mfd/ti_am335x_tscadc.h b/include/linux/mfd/ti_am335x_tscadc.h"
+      HUNK: "@@ -71,8 +71,6 @@"
+         WARN:  "merge"  line not found at 71: "#define STEPCONFIG_INM_ADCREFM	STEPCONFIG_INM(8)"
+         WARN:  "merge"  line not found at 72: "#define STEPCONFIG_INP_MASK	(0xF << 19)"
+         WARN:  "merge"  line not found at 73: "#define STEPCONFIG_INP(val)	((val) << 19)"
+         WARN:  "merge"  line not found at 74: "#define STEPCONFIG_INP_AN4	STEPCONFIG_INP(4)"
+         WARN:  "merge"  line not found at 75: "#define STEPCONFIG_INP_ADCREFM	STEPCONFIG_INP(8)"
+         WARN:  "merge"  line not found at 76: "#define STEPCONFIG_FIFO1	BIT(26)"
+         FIND:  "merge"  line found at 79: "#define STEPCONFIG_INM_ADCREFM	STEPCONFIG_INM(8)"
+         FIND:  "merge"  line found at 80: "#define STEPCONFIG_INP_MASK	(0xF << 19)"
+         FIND:  "merge"  line found at 81: "#define STEPCONFIG_INP(val)	((val) << 19)"
+         FIND:  "merge"  line found at 82: "#define STEPCONFIG_INP_AN4	STEPCONFIG_INP(4)"
+         FIND:  "merge"  line found at 83: "#define STEPCONFIG_INP_ADCREFM	STEPCONFIG_INP(8)"
+         FIND:  "merge"  line found at 84: "#define STEPCONFIG_FIFO1	BIT(26)"
+
+ For a patch whose additions have been applied::
+ 
+    PATCH: "arm/0005-ARM-DTS-AM33XX-Add-PMU-support.patch"
+       DIFF: "diff --git a/arch/arm/boot/dts/am33xx.dtsi b/arch/arm/boot/dts/am33xx.dtsi"
+            HUNK: "@@ -48,6 +48,11 @@"
+               WARN:  "merge"  line not found at 48: "		};"
+               WARN:  "merge"  line not found at 49: "	};"
+               WARN:  "merge"  line not found at 50: ""
+               INFO:  "add"    line not found at next line: "	pmu {"
+               INFO:  "add"    line not found at next line: "		compatible = "arm,cortex-a8-pmu";"
+               INFO:  "add"    line not found at next line: "		interrupts = <3>;"
+               INFO:  "add"    line not found at next line: "	};"
+               INFO:  "add"    line not found at next line: ""
+               WARN:  "merge"  line not found at 51: "	/*"
+               WARN:  "merge"  line not found at 52: "	 * The soc node represents the soc top level view. It is uses for IPs"
+               WARN:  "merge"  line not found at 53: "	 * that are not memory mapped in the MPU view or for the MPU itself."
+               FIND:  "add" line found at 69: "	pmu {"
+               FIND:  "add" line found at 70: "		compatible = "arm,cortex-a8-pmu";"
+               FIND:  "add" line found at 71: "		interrupts = <3>;"
+               FIND:  "merge" line found at 76: "	 * that are not memory mapped in the MPU view or for the MPU itself."
+        INFO:  1 patch errors
+   
+   All of the "add" lines were found in the source file, although not at the locations where the patch expected
+   to insert them. Thus the patch is not needed.
+   
+   For a patch whose deletions have been applied::
+   
+       HUNK: "@@ -127,7 +138,7 @@ static int tiadc_read_raw(struct iio_dev *indio_dev,"
+         WARN:  "merge"  line not found at 127: "		if (i == chan->channel)"
+         WARN:  "merge"  line not found at 128: "			*val = readx1 & 0xfff;"
+         WARN:  "merge"  line not found at 129: "	}"
+         ERROR: "delete" line not found at 130: "	am335x_tsc_se_update(adc_dev->mfd_tscadc);"
+         WARN:  "merge"  line not found at 131: ""
+         WARN:  "merge"  line not found at 132: "	return IIO_VAL_INT;"
+         WARN:  "merge"  line not found at 133: "}"
+         
+   Note that the *Checker's* find logic only looks for significant lines, so it did not search for '};', etc.
+   The logic also did not find the line starting with '* The soc node', which is in the file, but with a slightly
+   different spelling.
+   
+   
+
+    
+
+
+
+
+
+
+

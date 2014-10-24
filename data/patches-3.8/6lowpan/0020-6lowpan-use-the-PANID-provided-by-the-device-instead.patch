@@ -1,0 +1,33 @@
+From 6f2b7cfc845d1fe460a7daefd3b7b126d6f74499 Mon Sep 17 00:00:00 2001
+From: Tony Cheneau <tony.cheneau@amnesiak.org>
+Date: Mon, 25 Mar 2013 23:59:31 -0400
+Subject: [PATCH 20/23] 6lowpan: use the PANID provided by the device instead
+ of a static value
+
+Signed-off-by: Tony Cheneau <tony.cheneau@amnesiak.org>
+---
+ net/ieee802154/6lowpan.c |    6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/net/ieee802154/6lowpan.c b/net/ieee802154/6lowpan.c
+index d1d4ee6..276971b 100644
+--- a/net/ieee802154/6lowpan.c
++++ b/net/ieee802154/6lowpan.c
+@@ -577,10 +577,12 @@ static int lowpan_header_create(struct sk_buff *skb,
+ 
+ 		/* prepare wpan address data */
+ 		sa.addr_type = IEEE802154_ADDR_LONG;
+-		sa.pan_id = 0xff;
++		sa.pan_id = ieee802154_mlme_ops(dev)->get_pan_id(dev);
++
+ 		memcpy(&(sa.hwaddr), saddr, 8);
++		/* intra-PAN communications */
++		da.pan_id = ieee802154_mlme_ops(dev)->get_pan_id(dev);
+ 
+-		da.pan_id = 0xff;
+ 		/*
+ 		 * if the destination address is the broadcast address, use the
+ 		 * corresponding short address
+-- 
+1.7.9.5
+

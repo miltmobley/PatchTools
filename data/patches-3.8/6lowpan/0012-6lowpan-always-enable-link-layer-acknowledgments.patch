@@ -1,0 +1,34 @@
+From 0b12c64bcd6e70430d68e14021266323e5ed388f Mon Sep 17 00:00:00 2001
+From: Tony Cheneau <tony.cheneau@amnesiak.org>
+Date: Mon, 25 Mar 2013 23:59:23 -0400
+Subject: [PATCH 12/23] 6lowpan: always enable link-layer acknowledgments
+
+This feature is especially important when using fragmentation, because
+the reassembly mechanism cannot recover from the loss of a fragment.
+
+Note that some hardware ignore this flag and not will not transmit
+acknowledgments even if this is set.
+
+Signed-off-by: Tony Cheneau <tony.cheneau@amnesiak.org>
+---
+ net/ieee802154/6lowpan.c |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/net/ieee802154/6lowpan.c b/net/ieee802154/6lowpan.c
+index 9f53904..e7f61de 100644
+--- a/net/ieee802154/6lowpan.c
++++ b/net/ieee802154/6lowpan.c
+@@ -584,6 +584,10 @@ static int lowpan_header_create(struct sk_buff *skb,
+ 
+ 		mac_cb(skb)->flags = IEEE802154_FC_TYPE_DATA;
+ 
++		/* request acknowledgment when possible */
++		if (!lowpan_is_addr_broadcast(daddr))
++			mac_cb(skb)->flags |= MAC_CB_FLAG_ACKREQ;
++
+ 		return dev_hard_header(skb, lowpan_dev_info(dev)->real_dev,
+ 				type, (void *)&da, (void *)&sa, skb->len);
+ 	}
+-- 
+1.7.9.5
+
