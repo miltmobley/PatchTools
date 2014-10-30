@@ -45,7 +45,6 @@ class Viewer(PTObject):
                     target    (string, required): name or path for target program
                     multifile (bool, required):   can open multiple files in a single invocation
                     multiview (bool, required):   can display multiple files in a single window
-                root (string, optional): a path to prefix to all filenames
                 wait (bool, optional):   wait for subprocess to exit
                     default is False
             
@@ -67,10 +66,8 @@ class Viewer(PTObject):
         
         if (isinstance(params, dict)):
             editor = self._check_optional_param(params, 'editor', dict, None)
-            self.root = self._check_optional_string_param(params, 'root', None)
         else:
             editor = None
-            self.root = None
             
         is_windows = ut.is_windows()
         

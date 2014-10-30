@@ -23,13 +23,14 @@ The files in patchset order:
 '''
 from patchtools.lib.helper     import Helper
 from patchtools.lib.exceptions import ExceptionHandler
+from patchtools.lib.patchset   import PatchSet
 
 def find_patch_refs():
     l = h.list_patches()
     t = { "substr" : ["cape/beaglebone/capemgr.c"] }
     f = h.find(t, { "root_path" : c['patchdir'], "file_paths" : l, "format" : "files" })
     # Note that find will not return matches in patchset order
-    f = h.PatchSet(c['defaults']).sort_patches({ "patches" : f, "order": "patchset" })
+    f = PatchSet(c['defaults']).sort_patches({ "patches" : f, "order": "patchset" })
     h.save(f, "test1.tmp")
 
 # Apply the next patch in the series file
@@ -119,12 +120,13 @@ if __name__ == '__main__':
         h = Helper('config.json')
         c = h.config
     
-        reset_quilt()
-    
+        find_patch_refs()
         
+        '''
         # In this section we alternate between applying patches and matching
         # the result against the next patch:
         
+        reset_quilt()
         apply_patch()   # Apply not-capebus/0030
         
         check_ncb_0070()
@@ -161,6 +163,7 @@ if __name__ == '__main__':
         apply_patch()   # Apply capes/0008
         
         # capemgr.c is now in ./quilt/drivers/misc/cape/beaglebone
+        '''
         
         # In this section we use "git am" to apply the patches to the actual kernel source tree
     

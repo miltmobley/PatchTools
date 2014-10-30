@@ -49,15 +49,20 @@ class Patch(PTObject):
         strings = strings.discard('"""','"""')
         
         # Split any email header from the patch data
-        (_, body) = strings.partition('diff --git ')
+        (_, body) = strings.partition('diff -')
         
         if (body is None): #all diffs commented out?
             self.diffs = []
             self.patch_type = 'text'
-        else:
+            self.patch_mode = 'git'
+        elif (body[0].startswith('diff --git ')):
             # Split any email footer from the patch data
             (body, _) = body.rpartition('-- ')
             self._parse_body(body, 'diff --git ')
+            self.patch_mode = 'git'
+        else:
+            self._parse_body(body, 'diff -')
+            self.patch_mode = 'urn'
     
     #++
     @staticmethod
