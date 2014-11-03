@@ -78,9 +78,9 @@ class Helper(object):
         strings = [ret[0]]
         for index in range(1, rlen):
             ret_str = ret[index]
-            if (ret_str.startswith('output: ')):
+            if (ret_str.startswith('stdout: ')):
                 strings += _format_string('output: ', ret_str[8:])
-            elif (ret_str.startswith('errors: ')):
+            elif (ret_str.startswith('stderr: ')):
                 strings += _format_string('errors: ', ret_str[8:])
         
         return strings

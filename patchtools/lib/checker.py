@@ -261,11 +261,11 @@ class Checker(PTObject):
                 text2 = edit2[1:]
                 norm2 = ut.normalize_string(text2)
                 if (norm2 == norm3): # Change already applied
-                    self._ok_msg('"change" line found at %d: "%s"' % (current, text2), 3)
+                    self._ok_msg('"after"  line found at %d: "%s"' % (current, text2), 3)
                 elif (norm1 == norm3): # Change not yet applied
-                    self._info_msg('"change" line not found at %d: "%s"' % (current, text2), 3)
+                    self._info_msg('"after"  line not found at %d: "%s"' % (current, text2), 3)
                 else:
-                    self._error_msg('"delete" line not found at %d: "%s"' % (current, text2), 3)
+                    self._error_msg('"before"  line not found at %d: "%s"' % (current, text1), 3)
                 current += 1 # advance to next edit line
                     
             elif (op == '-'): # delete line

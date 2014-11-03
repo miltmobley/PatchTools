@@ -839,12 +839,12 @@ by using a *Helper* script like this::
        h.write(l, test6.txt")
        h.vcpf("test6.txt", pd + patch, c['defaults'], ep)
 
-After checking the 76 patches we find that:
+After checking the 72 patches we find that:
 
     * 27 of the patches specify changes that are already in the kernel, so the patches can be ignored.
     * Another 28 of the patches relate to features we won't use, i.e. certain capes, so these patches can also be ignored.
     * One patch definitely needs to be fixed.
-    * 21 patches need fixing if we will use their features, e.g. AM335 reset control or TI's PM firmware.
+    * About 20 patches need fixing if we will use their features, e.g. AM335 reset control or TI's PM firmware.
     * One patch has an undesirable modification of generic kernel files to work around a device specific problem,
       and should be redone.
 

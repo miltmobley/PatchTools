@@ -21,9 +21,10 @@ def find_patch_refs():
     l = h.list_patches(c['defaults'])
     m = { "substr" : ["am33xx.dtsi", "am335x-boneblack.dts", "am335x-bone-common.dtsi",
           "tps65217.dtsi", "am33xx-clocks.dtsi"] }
-    f = h.find(m, { "root_path" : c['patchdir'], "file_paths" : l, "format" : "files" })
-    g = PatchSet(c['defaults']).sort_patches({ "patches" : f, "order" : "patchset" })
-    h.save(g, "test1.tmp")
+    f = h.find(m, { "root_path" : c['patchdir'], "file_paths" : l })
+    f = [s for s in f if 'diff --git ' in s]
+    #g = PatchSet(c['defaults']).sort_patches({ "patches" : f, "order" : "patchset" })
+    h.write(f, "test1.tmp")
 
 # Find patch refs using a regular expression. This will also capture references to
 # am335x-evm.dts and other files
@@ -31,15 +32,24 @@ def find_patch_refs2():
     l = h.list_patches(c['defaults'])
     m = { "regexp" : [r"^.*am33.*\.dts.*$"], "substr" : ["tps65217.dtsi"] }
     f = h.find(m, { "root_path" : c['patchdir'], "file_paths" : l, "format" : "files" })
-    g = PatchSet(c['defaults']).sort_patches({ "patches" : f, "order" : "patchset" })
-    h.save(g, "test2.tmp")
-    
+    f = [s for s in f if 'diff --git ' in s]
+    #g = PatchSet(c['defaults']).sort_patches({ "patches" : f, "order" : "patchset" })
+    h.save(f, "test2.tmp")
+
+def find_patch_refs3():
+    l = h.list_patches(c['defaults'])
+    m = { "substr" : [".dts"]}
+    f = h.find(m, { "root_path" : c['patchdir'], "file_paths" : l })
+    f = [s for s in f if 'diff --git ' in s]
+    f = Strings(f).sort().unique()
+    h.write(f, "test3.tmp")
+        
 # Extract patch names
 def trim_patch_refs():
-    strings = h.load("test1.tmp")
+    strings = h.read("test1.tmp")
     strings = [string[:string.find(':')] for string in strings]
     strings = Strings(strings).sort().unique()
-    h.save(strings, "test3.tmp")
+    h.write(strings, "test3.tmp")
     
 # The only source refs to the Beagle DTS files are in the files themselves   
 
@@ -81,11 +91,12 @@ if __name__ == '__main__':
         
         print("find patch refs")
         find_patch_refs()
-        find_patch_refs2()
+        #find_patch_refs2()
+        #find_patch_refs3()
         
         print("trim patch refs")
         trim_patch_refs()
-        
+        '''
         print("match_all_patches")
         match_all_patches()
         
@@ -94,6 +105,7 @@ if __name__ == '__main__':
         
         print("match one patch")
         match_vcpf_one_patch()
+        '''
     
     except KeyboardInterrupt:
         pass
