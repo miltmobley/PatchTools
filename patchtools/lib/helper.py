@@ -284,13 +284,14 @@ class Helper(object):
                 according to content.
         """
         if (isinstance(data, list)):
-            text = '\n'.join(data) + '\n'
+            ut.write_strings(data, filepath)
         elif (isinstance(data, dict)):
-            text = self._format_dict(data)
+            ut.write_strings(self._format_dict(data))
         elif (ut.is_string_type(data)):
-            text = data + '\n'
-        ut.write_file(text, filepath)
-    
+            ut.write_file(data + '\n', filepath)
+        else:
+            raise ParametersError('text')
+        
     #++
     def list_patches(self, sel=None, params=None):
         

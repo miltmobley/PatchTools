@@ -35,7 +35,7 @@ for index1 in range(len(filedata)):
 
 setup(
     name = 'patchtools',
-    version = '1.0.4',
+    version = '1.0.5',
     description = 'Linux kernel patch evaluator',
     long_description=readme + '\n\n' + copying,
     author = 'Milton Mobley',

@@ -117,8 +117,7 @@ class Matcher(PTObject):
         
         if (self.callbacks is not None):
             for callback in self.callbacks:
-                ret = callback(string)
-                if (ret is not None):
+                if callback(string):
                     return str(callback)
   
         return None

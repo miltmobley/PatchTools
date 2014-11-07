@@ -183,7 +183,7 @@ class Functions(object):
                     ]
     #++
     @staticmethod
-    def read_file(path, enc='latin_1'):
+    def read_file(path):
         """ Read file data.
         
         Args:
@@ -191,19 +191,34 @@ class Functions(object):
         
         Returns:
             File data as a single object.
+        
+        Notes:
+            Kernel and distro files may contain Latin-1 characters whose numeric
+            values are not legal start bytes of utf-8 characters.
         """
         #--
         if _is_windows:
-            path = path.replace('/','\\')  
-        inpt = io.open(path, "r", encoding=enc, errors='strict') 
-        data = inpt.read()
-        inpt.close()
+            path = path.replace('/','\\')
+        
+        inpt = io.open(path, "r", encoding='utf-8', errors='strict')
+        try:      
+            data = inpt.read()
+        except UnicodeDecodeError:    
+            inpt = io.open(path, "r", encoding='latin_1', errors='strict')
+            try: 
+                data = inpt.read()
+            except Exception as e:
+                raise e
+            finally:
+                inpt.close()
+        finally:
+            inpt.close()
       
         return data
 
     #++
     @staticmethod
-    def read_lines(path, enc='latin_1'):
+    def read_lines(path):
         """ Read file lines.
         
         Args:
@@ -213,17 +228,11 @@ class Functions(object):
             File data as a list of '\n' terminated strings.
         """
         #--
-        if _is_windows:
-            path = path.replace('/','\\')
-        inpt = io.open(path, "r", encoding=enc, errors='strict') 
-        data = inpt.readlines()
-        inpt.close()
-    
-        return data
+        return [(s + '\n') for s in Functions.read_strings(path)]
 
     #++
     @staticmethod
-    def read_strings(path, enc='latin_1'):
+    def read_strings(path):
         """ Read file strings.
         
         Args:
@@ -233,17 +242,13 @@ class Functions(object):
             File data as a list of strings.
         """
         #--
-        if _is_windows:
-            path = path.replace('/','\\')
-        inpt = io.open(path, "r", encoding=enc, errors='strict') 
-        data = inpt.readlines()
-        inpt.close() 
+        data = Functions.read_file(path)
     
-        return [string.rstrip('\n') for string in data]
-
+        return data.rstrip('\n').split('\n')
+        
     #++
     @staticmethod
-    def write_file(text, path, enc='latin_1'):
+    def write_file(text, path):
         """ Write text to file at path
         
         Args:
@@ -255,16 +260,21 @@ class Functions(object):
         """
         #--
         if _is_windows:
-            path = path.replace('/','\\') 
-        oupt = io.open(path, "w", encoding=enc, errors='strict')
+            path = path.replace('/','\\')
+        
+        oupt = io.open(path, "w", encoding='utf-8', errors='strict')
         if (not _is_python3):
-            text = unicode(text)
+            if (not isinstance(text, unicode)):
+                try:
+                    text = unicode(text)
+                except:
+                    text = text.decode('utf-8')     
         oupt.write(text)
-        oupt.close()
+        oupt.close()  
 
     #++
     @staticmethod
-    def write_strings(strings, path, enc='latin_1'):
+    def write_strings(strings, path):
         """ Write strings to file at(path)
         
         Args:
@@ -281,10 +291,16 @@ class Functions(object):
         #--
         if _is_windows:
             path = path.replace('/','\\')
-        oupt = io.open(path, "w", encoding=enc, errors='strict') 
+        
+        oupt = io.open(path, "w", encoding='utf-8', errors='strict')
+         
         for string in strings:
             if (not _is_python3):
-                string = unicode(string)
+                if (not isinstance(string, unicode)):
+                    try:
+                        string = unicode(string)
+                    except:
+                        string = string.decode('utf-8')     
             oupt.write(string + '\n')
         oupt.close()
         

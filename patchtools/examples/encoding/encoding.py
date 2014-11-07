@@ -15,9 +15,13 @@ from patchtools.lib.functions  import Functions as ut
 
 def is_text_file(string):
     
+    if ('defkeymap.map' in string):
+        pass
     path = ut.join_path(c['sourcedir'], string)
     inpt = open(path, "rb")
-    abuf = inpt.read(min(256, ut.file_size(path)))
+    fsiz = ut.file_size(path)
+    abuf = inpt.read(min(1024, fsiz))
+    inpt.close()
     ret  = chardetect(abuf)
     return (isinstance(ret, dict) and ('encoding' in ret) and (ret['encoding'] is not None))
 
@@ -25,7 +29,6 @@ def _enumerate():
     
     p = { "root_path" : c['sourcedir'], "excl_dirs" : [".git"],
           "incl_files" : { 'funcs' : [is_text_file] }, 'test_dirs' : True }
-    print('walking ...')
     w = h.walk(p)
     print(str(len(w)))
     h.write(w, 'walk.txt')
@@ -34,12 +37,11 @@ def _iterate():
 
     r = c['sourcedir']
     t = ut.join_path(c['tempdir'], 'encoding.dat')
-    w = h.read('walk.txt')   
+    w = h.read('walk.txt')
     for file_ in w:
-        #print(file_)
         path = ut.join_path(r, file_)
-        s = ut.read_strings(path, 'latin_1')
-        ut.write_strings(s, t, 'latin_1')
+        s = ut.read_strings(path)
+        ut.write_strings(s, t)
           
 if __name__ == '__main__':
     
@@ -50,8 +52,15 @@ if __name__ == '__main__':
     try:
         h = Helper('config.json')
         c = h.config
+        
+        print('walking ...')
         _enumerate()
+        
+        print('iterating ...')
         _iterate()
+        
+        print('done')
+        
     except KeyboardInterrupt:
         pass
     except Exception as e:
